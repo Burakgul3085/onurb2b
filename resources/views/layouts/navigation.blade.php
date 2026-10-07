@@ -30,6 +30,11 @@
                             {{ __('My company') }}
                         </x-nav-link>
                     @endif
+                    @can('viewAny', App\Models\Product::class)
+                        <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*', 'brands.*', 'categories.*', 'units.*')">
+                            {{ __('Products') }}
+                        </x-nav-link>
+                    @endcan
                 </div>
             </div>
 
@@ -100,6 +105,11 @@
                     {{ __('My company') }}
                 </x-responsive-nav-link>
             @endif
+            @can('viewAny', App\Models\Product::class)
+                <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*', 'brands.*', 'categories.*', 'units.*')">
+                    {{ __('Products') }}
+                </x-responsive-nav-link>
+            @endcan
         </div>
 
         <!-- Responsive Settings Options -->
