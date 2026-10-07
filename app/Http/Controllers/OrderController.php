@@ -15,6 +15,7 @@ use App\Models\Delivery;
 use App\Models\Order;
 use App\Models\StockLevel;
 use App\Models\Warehouse;
+use App\Policies\LedgerEntryPolicy;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -59,7 +60,7 @@ class OrderController extends Controller
     {
         abort_unless($request->user()?->can('view', $order), 404);
 
-        $order->load(['lines', 'dealer', 'warehouse', 'user', 'approver', 'canceller', 'deliveries.driver']);
+        $order->load(['lines', 'dealer', 'warehouse', 'user', 'approver', 'canceller', 'deliveries.driver', 'deliveries.document', 'ledgerEntries']);
         $warehouses = Warehouse::query()->where('is_active', true)->orderBy('name')->get();
         $warehouse = $this->selectedWarehouse($request, $warehouses, $order);
 
@@ -70,6 +71,7 @@ class OrderController extends Controller
             'availability' => $warehouse === null ? [] : $this->availability($warehouse, $order),
             'canApprove' => $request->user()->can('approve', $order),
             'canCancel' => $request->user()->can('cancel', $order),
+            'canReturn' => app(LedgerEntryPolicy::class)->returnGoods($request->user(), $order),
             'canScheduleDelivery' => $request->user()->can('create', Delivery::class) && in_array($order->status, [
                 OrderStatus::Approved,
                 OrderStatus::Preparing,

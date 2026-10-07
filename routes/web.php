@@ -4,10 +4,13 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CompanySettingController;
 use App\Http\Controllers\DealerApplicationController;
 use App\Http\Controllers\DealerController;
 use App\Http\Controllers\DealerPriceController;
 use App\Http\Controllers\DeliveryController;
+use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\FinanceController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PriceListController;
 use App\Http\Controllers\ProductController;
@@ -60,12 +63,22 @@ Route::middleware('auth')->group(function () {
     Route::post('/deliveries/{delivery}/fail', [DeliveryController::class, 'fail'])->name('deliveries.fail');
     Route::delete('/deliveries/{delivery}', [DeliveryController::class, 'destroy'])->name('deliveries.destroy');
 
+    Route::get('/settings', [CompanySettingController::class, 'edit'])->name('settings.edit');
+    Route::patch('/settings', [CompanySettingController::class, 'update'])->name('settings.update');
+    Route::get('/documents/{document}', [DocumentController::class, 'show'])->name('documents.show');
+
+    Route::get('/finance', [FinanceController::class, 'index'])->name('finance.index');
+    Route::post('/finance/entries/{entry}/reverse', [FinanceController::class, 'reverse'])->name('finance.entries.reverse');
+    Route::get('/finance/{dealer}', [FinanceController::class, 'show'])->whereNumber('dealer')->name('finance.show');
+    Route::post('/finance/{dealer}/collections', [FinanceController::class, 'collect'])->whereNumber('dealer')->name('finance.collections.store');
+
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/approve', [OrderController::class, 'approve'])->name('orders.approve');
     Route::post('/orders/{order}/prepare', [OrderController::class, 'prepare'])->name('orders.prepare');
     Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+    Route::post('/orders/{order}/returns', [FinanceController::class, 'storeReturn'])->name('orders.returns.store');
 
     Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
     Route::post('/catalog/quick-order', [CatalogController::class, 'quickOrder'])->name('catalog.quick-order');

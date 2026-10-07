@@ -115,4 +115,12 @@ class Order extends Model
     {
         return $this->hasMany(Delivery::class);
     }
+
+    /**
+     * @return HasMany<LedgerEntry, $this>
+     */
+    public function ledgerEntries(): HasMany
+    {
+        return $this->hasMany(LedgerEntry::class);
+    }
 }

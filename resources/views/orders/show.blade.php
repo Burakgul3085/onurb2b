@@ -39,7 +39,12 @@
             @forelse ($order->deliveries as $delivery)
                 <div class="flex flex-wrap items-center justify-between gap-2">
                     <span>{{ $delivery->scheduled_on->format('d.m.Y') }} {{ $delivery->scheduled_time ? substr((string) $delivery->scheduled_time, 0, 5) : '' }} · {{ $delivery->driver->name }} · {{ $delivery->sequence }}@if ($delivery->recipient_name) · {{ $delivery->recipient_name }}@endif</span>
-                    <x-badge :tone="$delivery->status->tone()">{{ $delivery->status->label() }}</x-badge>
+                    <span class="flex items-center gap-3">
+                        @if ($delivery->document)
+                            <a class="link" href="{{ route('documents.show', $delivery->document) }}">{{ __('Delivery note') }}</a>
+                        @endif
+                        <x-badge :tone="$delivery->status->tone()">{{ $delivery->status->label() }}</x-badge>
+                    </span>
                 </div>
             @empty
                 <p class="text-ink-muted">{{ __('No deliveries yet.') }}</p>
@@ -54,6 +59,7 @@
                         <th>{{ __('Requested') }}</th>
                         <th>{{ __('Approved quantity') }}</th>
                         <th>{{ __('Delivered') }}</th>
+                        <th>{{ __('Returned') }}</th>
                         <th>{{ __('Unit price') }}</th>
                         <th>{{ __('Net') }}</th>
                         <th>{{ __('VAT') }}</th>
@@ -70,6 +76,7 @@
                             <td>{{ $line->requested_pieces }} {{ __('pieces') }}</td>
                             <td>{{ $line->approved_pieces }} {{ __('pieces') }}</td>
                             <td>{{ $line->delivered_pieces }} {{ __('pieces') }}</td>
+                            <td>{{ $line->returned_pieces }} {{ __('pieces') }}</td>
                             <td class="whitespace-nowrap">{{ \App\Support\Money\Money::format($line->unit_price) }} ₺</td>
                             <td class="whitespace-nowrap">{{ \App\Support\Money\Money::format($line->net) }} ₺</td>
                             <td class="whitespace-nowrap">{{ \App\Support\Money\Money::format($line->vat) }} ₺</td>
@@ -109,6 +116,33 @@
                     <form method="POST" action="{{ route('orders.prepare', $order) }}">
                         @csrf
                         <x-primary-button>{{ __('Mark as preparing') }}</x-primary-button>
+                    </form>
+                @endif
+
+                @if ($canReturn && $order->lines->contains(fn ($line) => $line->delivered_pieces > $line->returned_pieces))
+                    <form method="POST" action="{{ route('orders.returns.store', $order) }}" class="card space-y-4 p-6">
+                        @csrf
+                        <h3 class="font-semibold text-ink">{{ __('Operational return') }}</h3>
+                        <p class="text-sm text-ink-muted">{{ __('This return is not an official document.') }}</p>
+                        @foreach ($order->lines as $line)
+                            @if ($line->delivered_pieces > $line->returned_pieces)
+                                <div>
+                                    <x-input-label :for="'return_'.$line->id" :value="$line->sku.' — '.__('Returned')" />
+                                    <x-text-input :id="'return_'.$line->id" name="pieces[{{ $line->id }}]" type="number" min="0" :max="$line->delivered_pieces - $line->returned_pieces" class="mt-1 block w-40" :value="old('pieces.'.$line->id, 0)" required />
+                                    <p class="mt-1 text-xs text-ink-muted">{{ __('Delivered') }}: {{ $line->delivered_pieces }} · {{ __('Returned') }}: {{ $line->returned_pieces }}</p>
+                                </div>
+                            @endif
+                        @endforeach
+                        <div>
+                            <x-input-label for="return_date" :value="__('Document date')" />
+                            <x-text-input id="return_date" name="document_date" type="date" class="mt-1 block w-full" :value="old('document_date', now()->toDateString())" required />
+                        </div>
+                        <div>
+                            <x-input-label for="return_note" :value="__('Note')" />
+                            <textarea id="return_note" name="note" class="field" rows="2">{{ old('note') }}</textarea>
+                        </div>
+                        <x-input-error :messages="$errors->get('pieces')" />
+                        <x-primary-button>{{ __('Record return') }}</x-primary-button>
                     </form>
                 @endif
 

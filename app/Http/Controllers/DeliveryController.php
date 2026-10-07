@@ -74,7 +74,7 @@ class DeliveryController extends Controller
     public function show(Request $request, Delivery $delivery): View
     {
         abort_unless($request->user()?->can('view', $delivery), 404);
-        $delivery->load(['lines.orderLine', 'order', 'dealer', 'driver']);
+        $delivery->load(['lines.orderLine', 'order', 'dealer', 'driver', 'document']);
 
         return view('deliveries.show', [
             'delivery' => $delivery,

@@ -2,9 +2,12 @@
 
 namespace App\Actions\Deliveries;
 
+use App\Actions\Documents\IssueDeliveryDocument;
+use App\Actions\Finance\PostDeliverySale;
 use App\Actions\Stock\RecordStockMovement;
 use App\Enums\DeliveryStatus;
 use App\Exceptions\DeliveryException;
+use App\Exceptions\FinanceException;
 use App\Exceptions\StockException;
 use App\Models\Delivery;
 use App\Models\User;
@@ -16,6 +19,8 @@ class CompleteDelivery
     public function __construct(
         private RecordStockMovement $stock,
         private SyncOrderAfterDelivery $syncOrder,
+        private PostDeliverySale $sales,
+        private IssueDeliveryDocument $documents,
     ) {}
 
     /**
@@ -27,7 +32,7 @@ class CompleteDelivery
         try {
             return DB::transaction(function () use ($delivery, $deliveredPieces, $data, $actor, $proof) {
                 $delivery = Delivery::query()->whereKey($delivery->id)->lockForUpdate()->firstOrFail();
-                $delivery->load('lines.orderLine.product', 'order.warehouse');
+                $delivery->load('lines.orderLine.product', 'order.warehouse', 'order.dealer', 'order.lines');
 
                 if ($delivery->status !== DeliveryStatus::OutForDelivery || $delivery->order->warehouse === null) {
                     throw new DeliveryException(__('Only a delivery that has left the warehouse can be completed.'));
@@ -68,10 +73,19 @@ class CompleteDelivery
                     'finished_at' => now(),
                 ]);
                 $this->syncOrder->execute($delivery->order);
+                $deliveredByLine = [];
 
-                return $delivery->refresh();
+                foreach ($delivery->lines as $line) {
+                    $deliveredByLine[$line->order_line_id] = $deliveredPieces[$line->id];
+                }
+
+                $this->sales->execute($delivery, $deliveredByLine, $actor);
+                $delivery->refresh();
+                $this->documents->execute($delivery);
+
+                return $delivery;
             });
-        } catch (StockException $exception) {
+        } catch (StockException|FinanceException $exception) {
             throw new DeliveryException($exception->getMessage(), previous: $exception);
         }
     }

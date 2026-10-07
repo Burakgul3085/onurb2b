@@ -53,6 +53,16 @@
                             {{ __('Deliveries') }}
                         </x-nav-link>
                     @endcan
+                    @can('viewAny', App\Models\LedgerEntry::class)
+                        <x-nav-link :href="route('finance.index')" :active="request()->routeIs('finance.*')">
+                            {{ __('Ledger') }}
+                        </x-nav-link>
+                    @endcan
+                    @can('update', App\Models\CompanySetting::class)
+                        <x-nav-link :href="route('settings.edit')" :active="request()->routeIs('settings.*')">
+                            {{ __('Company details') }}
+                        </x-nav-link>
+                    @endcan
                     @can('viewPrices')
                         <x-nav-link :href="route('price-lists.index')" :active="request()->routeIs('price-lists.*')">
                             {{ __('Price lists') }}
@@ -141,9 +151,19 @@
                     {{ __('Deliveries') }}
                 </x-responsive-nav-link>
             @endcan
+            @can('viewAny', App\Models\LedgerEntry::class)
+                <x-responsive-nav-link :href="route('finance.index')" :active="request()->routeIs('finance.*')">
+                    {{ __('Ledger') }}
+                </x-responsive-nav-link>
+            @endcan
             @can('viewStock')
                 <x-responsive-nav-link :href="route('stock.index')" :active="request()->routeIs('stock.*', 'warehouses.*')">
                     {{ __('Stock') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('update', App\Models\CompanySetting::class)
+                <x-responsive-nav-link :href="route('settings.edit')" :active="request()->routeIs('settings.*')">
+                    {{ __('Company details') }}
                 </x-responsive-nav-link>
             @endcan
             @can('viewPrices')

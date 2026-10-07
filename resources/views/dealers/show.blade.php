@@ -12,6 +12,9 @@
                 </div>
             </div>
             <div class="flex flex-wrap gap-2">
+                @can('viewAny', App\Models\LedgerEntry::class)
+                    <a href="{{ route('finance.show', $dealer) }}" class="btn-secondary">{{ __('Ledger') }}</a>
+                @endcan
                 @can('viewPrices')
                     <a href="{{ route('dealers.prices.index', $dealer) }}" class="btn-secondary">{{ __('Special prices') }}</a>
                 @endcan

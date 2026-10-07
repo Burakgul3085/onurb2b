@@ -3,7 +3,12 @@
         <div>
             <p class="text-sm text-ink-muted">{{ $delivery->order->number }} · {{ $delivery->dealer->company_name }}</p>
             <h2 class="mt-1 text-2xl font-semibold tracking-tight text-ink">{{ __('Delivery') }} {{ $delivery->sequence }}</h2>
-            <div class="mt-3"><x-badge :tone="$delivery->status->tone()">{{ $delivery->status->label() }}</x-badge></div>
+            <div class="mt-3 flex flex-wrap items-center gap-3">
+                <x-badge :tone="$delivery->status->tone()">{{ $delivery->status->label() }}</x-badge>
+                @if ($delivery->document)
+                    <a class="link" href="{{ route('documents.show', $delivery->document) }}">{{ __('Delivery note') }}</a>
+                @endif
+            </div>
         </div>
     </x-slot>
 

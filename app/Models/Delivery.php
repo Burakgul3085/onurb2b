@@ -7,6 +7,7 @@ use App\Enums\District;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Delivery extends Model
 {
@@ -83,5 +84,13 @@ class Delivery extends Model
     public function lines(): HasMany
     {
         return $this->hasMany(DeliveryLine::class);
+    }
+
+    /**
+     * @return HasOne<DeliveryDocument, $this>
+     */
+    public function document(): HasOne
+    {
+        return $this->hasOne(DeliveryDocument::class);
     }
 }

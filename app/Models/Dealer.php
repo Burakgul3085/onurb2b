@@ -81,6 +81,14 @@ class Dealer extends Model
     }
 
     /**
+     * @return HasMany<LedgerEntry, $this>
+     */
+    public function entries(): HasMany
+    {
+        return $this->hasMany(LedgerEntry::class);
+    }
+
+    /**
      * @return BelongsTo<User, $this>
      */
     public function approvedBy(): BelongsTo
