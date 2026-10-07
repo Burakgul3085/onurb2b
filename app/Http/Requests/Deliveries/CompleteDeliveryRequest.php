@@ -24,7 +24,7 @@ class CompleteDeliveryRequest extends FormRequest
             'note' => ['nullable', 'string', 'max:1000'],
             'delivered' => ['required', 'array'],
             'delivered.*' => ['required', 'integer', 'min:0', 'max:10000000'],
-            'proof' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'proof' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'extensions:jpg,jpeg,png,webp', 'max:2048'],
         ];
     }
 }

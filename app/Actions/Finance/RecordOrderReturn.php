@@ -2,7 +2,9 @@
 
 namespace App\Actions\Finance;
 
+use App\Actions\Audit\RecordAudit;
 use App\Actions\Stock\RecordStockMovement;
+use App\Enums\AuditAction;
 use App\Enums\LedgerType;
 use App\Exceptions\FinanceException;
 use App\Exceptions\StockException;
@@ -67,6 +69,12 @@ class RecordOrderReturn
                     'document_date' => $documentDate,
                     'note' => $this->note($note) ?? $order->number,
                 ]);
+
+                app(RecordAudit::class)->write(AuditAction::LedgerPosted, $entry, $entry->number, [], [
+                    'type' => LedgerType::Return->value,
+                    'credit' => (string) $entry->credit,
+                    'dealer_id' => $entry->dealer_id,
+                ], $actor);
 
                 $orderReturn = OrderReturn::query()->create([
                     'order_id' => $order->id,

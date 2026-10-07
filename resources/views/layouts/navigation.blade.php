@@ -73,6 +73,11 @@
                             {{ __('Mail log') }}
                         </x-nav-link>
                     @endcan
+                    @can('viewAny', App\Models\AuditLog::class)
+                        <x-nav-link :href="route('audit-logs.index')" :active="request()->routeIs('audit-logs.*')">
+                            {{ __('Audit log') }}
+                        </x-nav-link>
+                    @endcan
                     @can('viewAny', App\Models\MailTemplate::class)
                         <x-nav-link :href="route('mail-templates.index')" :active="request()->routeIs('mail-templates.*')">
                             {{ __('Mail templates') }}
@@ -189,6 +194,11 @@
             @can('viewAny', App\Models\MailLog::class)
                 <x-responsive-nav-link :href="route('mail-logs.index')" :active="request()->routeIs('mail-logs.*')">
                     {{ __('Mail log') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('viewAny', App\Models\AuditLog::class)
+                <x-responsive-nav-link :href="route('audit-logs.index')" :active="request()->routeIs('audit-logs.*')">
+                    {{ __('Audit log') }}
                 </x-responsive-nav-link>
             @endcan
             @can('viewAny', App\Models\MailTemplate::class)

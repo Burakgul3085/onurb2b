@@ -2,6 +2,8 @@
 
 namespace App\Actions\Users;
 
+use App\Actions\Audit\RecordAudit;
+use App\Enums\AuditAction;
 use App\Enums\Permission;
 use App\Enums\Role;
 use App\Models\User;
@@ -17,6 +19,12 @@ class UpdateUser
     {
         return DB::transaction(function () use ($actor, $user, $data) {
             $roles = $data['roles'];
+            $before = [
+                'name' => $user->name,
+                'email' => $user->email,
+                'is_active' => $user->is_active,
+            ];
+            $beforeRoles = $user->getRoleNames()->sort()->values()->all();
 
             if (
                 $user->hasRole(Role::SuperAdmin->value)
@@ -43,6 +51,25 @@ class UpdateUser
 
             $user->update($attributes);
             $user->syncRoles($roles);
+            $user->refresh();
+
+            app(RecordAudit::class)->write(AuditAction::UserSaved, $user, $user->email, $before, [
+                'name' => $user->name,
+                'email' => $user->email,
+                'is_active' => $user->is_active,
+                'password_changed' => filled($data['password'] ?? null),
+            ], $actor);
+
+            $user->unsetRelation('roles');
+            $afterRoles = $user->getRoleNames()->sort()->values()->all();
+
+            if ($beforeRoles !== $afterRoles) {
+                app(RecordAudit::class)->write(AuditAction::PermissionChanged, $user, $user->email, [
+                    'roles' => $beforeRoles,
+                ], [
+                    'roles' => $afterRoles,
+                ], $actor);
+            }
 
             return $user;
         });

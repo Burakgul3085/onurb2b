@@ -2,7 +2,9 @@
 
 namespace App\Actions\Products;
 
+use App\Actions\Audit\RecordAudit;
 use App\Data\Products\ProductData;
+use App\Enums\AuditAction;
 use App\Models\Product;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +20,12 @@ class UpdateProduct
     public function execute(Product $product, array $data, ?UploadedFile $image = null): Product
     {
         return DB::transaction(function () use ($product, $data, $image) {
+            $before = [
+                'name' => $product->name,
+                'sku' => $product->sku,
+                'sale_price' => (string) $product->sale_price,
+                'is_active' => $product->is_active,
+            ];
             $productData = ProductData::fromArray($data);
             $attributes = $productData->toAttributes();
 
@@ -35,6 +43,14 @@ class UpdateProduct
 
             $product->update($attributes);
             $this->syncProductBarcodes->execute($product, $productData->barcodes);
+            $product->refresh();
+
+            app(RecordAudit::class)->write(AuditAction::ProductSaved, $product, $product->sku, $before, [
+                'name' => $product->name,
+                'sku' => $product->sku,
+                'sale_price' => (string) $product->sale_price,
+                'is_active' => $product->is_active,
+            ]);
 
             return $product;
         });

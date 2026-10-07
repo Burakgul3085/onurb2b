@@ -2,8 +2,10 @@
 
 namespace App\Actions\Dealers;
 
+use App\Actions\Audit\RecordAudit;
 use App\Actions\Mail\Notify;
 use App\Actions\Users\CreateUser;
+use App\Enums\AuditAction;
 use App\Enums\DealerApplicationStatus;
 use App\Enums\Role;
 use App\Models\Dealer;
@@ -52,6 +54,15 @@ class ApproveDealer
                 'approved_by' => $actor->id,
                 'rejection_reason' => null,
             ]);
+
+            app(RecordAudit::class)->write(
+                AuditAction::DealerApproved,
+                $dealer,
+                $dealer->company_name,
+                ['application_status' => DealerApplicationStatus::Pending->value],
+                ['application_status' => DealerApplicationStatus::Approved->value],
+                $actor,
+            );
 
             DB::afterCommit(function () use ($dealer, $user) {
                 app(Notify::class)->dealerApproved($dealer->id);

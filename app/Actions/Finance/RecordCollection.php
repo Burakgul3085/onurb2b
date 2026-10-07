@@ -2,7 +2,9 @@
 
 namespace App\Actions\Finance;
 
+use App\Actions\Audit\RecordAudit;
 use App\Actions\Mail\Notify;
+use App\Enums\AuditAction;
 use App\Enums\LedgerType;
 use App\Enums\PaymentMethod;
 use App\Exceptions\FinanceException;
@@ -34,6 +36,12 @@ class RecordCollection
                 'document_date' => $documentDate,
                 'note' => $this->note($note),
             ]);
+
+            app(RecordAudit::class)->write(AuditAction::CollectionRecorded, $entry, $entry->number, [], [
+                'type' => LedgerType::Collection->value,
+                'credit' => (string) $entry->credit,
+                'dealer_id' => $entry->dealer_id,
+            ], $actor);
 
             DB::afterCommit(fn () => app(Notify::class)->collectionRecorded($dealer->id, $amount));
 

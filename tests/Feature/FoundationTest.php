@@ -12,6 +12,7 @@ test('responses include baseline security headers', function () {
     $response->assertHeader('X-Frame-Options', 'SAMEORIGIN');
     $response->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
     $response->assertHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+    $response->assertHeader('Cross-Origin-Opener-Policy', 'same-origin');
     $response->assertHeaderMissing('Strict-Transport-Security');
 });
 

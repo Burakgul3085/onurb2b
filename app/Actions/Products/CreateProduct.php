@@ -2,7 +2,9 @@
 
 namespace App\Actions\Products;
 
+use App\Actions\Audit\RecordAudit;
 use App\Data\Products\ProductData;
+use App\Enums\AuditAction;
 use App\Models\Product;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -27,6 +29,13 @@ class CreateProduct
 
             $product = Product::query()->create($attributes);
             $this->syncProductBarcodes->execute($product, $productData->barcodes);
+
+            app(RecordAudit::class)->write(AuditAction::ProductSaved, $product, $product->sku, [], [
+                'name' => $product->name,
+                'sku' => $product->sku,
+                'sale_price' => (string) $product->sale_price,
+                'is_active' => $product->is_active,
+            ]);
 
             return $product;
         });

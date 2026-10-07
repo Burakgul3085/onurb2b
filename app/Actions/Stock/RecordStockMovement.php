@@ -2,6 +2,8 @@
 
 namespace App\Actions\Stock;
 
+use App\Actions\Audit\RecordAudit;
+use App\Enums\AuditAction;
 use App\Enums\StockMovementType;
 use App\Exceptions\StockException;
 use App\Models\Product;
@@ -147,7 +149,7 @@ class RecordStockMovement
         $before = $level->physical_stock;
         $level->update(['physical_stock' => $next]);
 
-        return StockMovement::query()->create([
+        $movement = StockMovement::query()->create([
             'warehouse_id' => $warehouse->id,
             'product_id' => $product->id,
             'type' => $type,
@@ -159,6 +161,19 @@ class RecordStockMovement
             'note' => $note !== null && trim($note) !== '' ? trim($note) : null,
             'user_id' => $actor->id,
         ]);
+
+        if (in_array($type, [StockMovementType::Adjustment, StockMovementType::Count], true)) {
+            app(RecordAudit::class)->write(
+                AuditAction::StockAdjusted,
+                $product,
+                $product->sku,
+                ['physical_stock' => $before, 'warehouse_id' => $warehouse->id],
+                ['physical_stock' => $next, 'quantity' => $delta],
+                $actor,
+            );
+        }
+
+        return $movement;
     }
 
     private function lockLevel(int $warehouseId, int $productId): StockLevel

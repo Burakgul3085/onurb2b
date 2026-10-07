@@ -21,7 +21,7 @@ class FailDeliveryRequest extends FormRequest
     {
         return [
             'note' => ['required', 'string', 'max:1000'],
-            'proof' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'proof' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'extensions:jpg,jpeg,png,webp', 'max:2048'],
         ];
     }
 }

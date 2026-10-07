@@ -2,6 +2,8 @@
 
 namespace App\Actions\Finance;
 
+use App\Actions\Audit\RecordAudit;
+use App\Enums\AuditAction;
 use App\Enums\LedgerType;
 use App\Models\Delivery;
 use App\Models\LedgerEntry;
@@ -31,7 +33,7 @@ class PostDeliverySale
             $postedOn = now();
             $days = (int) $delivery->order->dealer->payment_term_days;
 
-            return LedgerEntry::query()->create([
+            $entry = LedgerEntry::query()->create([
                 'number' => LedgerEntry::nextNumber(),
                 'dealer_id' => $delivery->order->dealer_id,
                 'order_id' => $delivery->order_id,
@@ -44,6 +46,15 @@ class PostDeliverySale
                 'due_on' => $postedOn->copy()->addDays($days)->toDateString(),
                 'note' => $delivery->order->number,
             ]);
+
+            app(RecordAudit::class)->write(AuditAction::LedgerPosted, $entry, $entry->number, [], [
+                'type' => LedgerType::Sale->value,
+                'debit' => (string) $entry->debit,
+                'credit' => '0.00',
+                'dealer_id' => $entry->dealer_id,
+            ], $actor);
+
+            return $entry;
         });
     }
 }

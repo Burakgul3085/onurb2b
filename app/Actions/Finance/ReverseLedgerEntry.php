@@ -2,7 +2,9 @@
 
 namespace App\Actions\Finance;
 
+use App\Actions\Audit\RecordAudit;
 use App\Actions\Stock\RecordStockMovement;
+use App\Enums\AuditAction;
 use App\Enums\LedgerType;
 use App\Exceptions\FinanceException;
 use App\Exceptions\StockException;
@@ -34,7 +36,7 @@ class ReverseLedgerEntry
 
                 $text = trim((string) $note);
 
-                return LedgerEntry::query()->create([
+                $reversal = LedgerEntry::query()->create([
                     'number' => LedgerEntry::nextNumber(),
                     'dealer_id' => $entry->dealer_id,
                     'order_id' => $entry->order_id,
@@ -47,6 +49,16 @@ class ReverseLedgerEntry
                     'note' => $text !== '' ? $text : $entry->number,
                     'reverses_entry_id' => $entry->id,
                 ]);
+
+                app(RecordAudit::class)->write(AuditAction::LedgerPosted, $reversal, $reversal->number, [
+                    'reverses' => $entry->number,
+                ], [
+                    'type' => LedgerType::Reversal->value,
+                    'debit' => (string) $reversal->debit,
+                    'credit' => (string) $reversal->credit,
+                ], $actor);
+
+                return $reversal;
             });
         } catch (StockException $exception) {
             throw new FinanceException($exception->getMessage(), previous: $exception);

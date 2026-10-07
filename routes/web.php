@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
@@ -40,9 +41,9 @@ Route::get('/dashboard', DashboardController::class)->middleware(['auth', 'verif
 Route::middleware('auth')->group(function () {
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
-    Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    Route::post('/users', [UserController::class, 'store'])->middleware('throttle:30,1')->name('users.store');
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
-    Route::patch('/users/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::patch('/users/{user}', [UserController::class, 'update'])->middleware('throttle:30,1')->name('users.update');
 
     Route::get('/dealers', [DealerController::class, 'index'])->name('dealers.index');
     Route::get('/dealers/create', [DealerController::class, 'create'])->name('dealers.create');
@@ -50,12 +51,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/dealers/{dealer}', [DealerController::class, 'show'])->name('dealers.show');
     Route::get('/dealers/{dealer}/edit', [DealerController::class, 'edit'])->name('dealers.edit');
     Route::patch('/dealers/{dealer}', [DealerController::class, 'update'])->name('dealers.update');
-    Route::post('/dealers/{dealer}/approve', [DealerController::class, 'approve'])->name('dealers.approve');
+    Route::post('/dealers/{dealer}/approve', [DealerController::class, 'approve'])->middleware('throttle:10,1')->name('dealers.approve');
     Route::get('/dealers/{dealer}/prices', [DealerPriceController::class, 'index'])->name('dealers.prices.index');
     Route::post('/dealers/{dealer}/prices', [DealerPriceController::class, 'store'])->name('dealers.prices.store');
     Route::get('/dealers/{dealer}/prices/{dealerPrice}/edit', [DealerPriceController::class, 'edit'])->name('dealers.prices.edit');
     Route::patch('/dealers/{dealer}/prices/{dealerPrice}', [DealerPriceController::class, 'update'])->name('dealers.prices.update');
-    Route::post('/dealers/{dealer}/reject', [DealerController::class, 'reject'])->name('dealers.reject');
+    Route::post('/dealers/{dealer}/reject', [DealerController::class, 'reject'])->middleware('throttle:10,1')->name('dealers.reject');
 
     Route::get('/deliveries', [DeliveryController::class, 'index'])->name('deliveries.index');
     Route::get('/deliveries/create', [DeliveryController::class, 'create'])->name('deliveries.create');
@@ -76,6 +77,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/mail-templates/{template}/edit', [MailTemplateController::class, 'edit'])->name('mail-templates.edit');
     Route::patch('/mail-templates/{template}', [MailTemplateController::class, 'update'])->name('mail-templates.update');
     Route::get('/mail-logs', [MailLogController::class, 'index'])->name('mail-logs.index');
+    Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
 
     Route::get('/settings', [CompanySettingController::class, 'edit'])->name('settings.edit');
     Route::patch('/settings', [CompanySettingController::class, 'update'])->name('settings.update');
@@ -87,14 +89,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/finance', [FinanceController::class, 'index'])->name('finance.index');
     Route::post('/finance/entries/{entry}/reverse', [FinanceController::class, 'reverse'])->name('finance.entries.reverse');
     Route::get('/finance/{dealer}', [FinanceController::class, 'show'])->whereNumber('dealer')->name('finance.show');
-    Route::post('/finance/{dealer}/collections', [FinanceController::class, 'collect'])->whereNumber('dealer')->name('finance.collections.store');
+    Route::post('/finance/{dealer}/collections', [FinanceController::class, 'collect'])->whereNumber('dealer')->middleware('throttle:30,1')->name('finance.collections.store');
 
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/approve', [OrderController::class, 'approve'])->name('orders.approve');
     Route::post('/orders/{order}/prepare', [OrderController::class, 'prepare'])->name('orders.prepare');
-    Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+    Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->middleware('throttle:30,1')->name('orders.cancel');
     Route::post('/orders/{order}/returns', [FinanceController::class, 'storeReturn'])->name('orders.returns.store');
 
     Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
@@ -140,7 +142,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/stock', [StockController::class, 'index'])->name('stock.index');
     Route::get('/stock/movements', [StockController::class, 'movements'])->name('stock.movements');
     Route::get('/stock/create', [StockController::class, 'create'])->name('stock.create');
-    Route::post('/stock', [StockController::class, 'store'])->name('stock.store');
+    Route::post('/stock', [StockController::class, 'store'])->middleware('throttle:30,1')->name('stock.store');
 
     Route::get('/units', [UnitController::class, 'index'])->name('units.index');
     Route::post('/units', [UnitController::class, 'store'])->name('units.store');

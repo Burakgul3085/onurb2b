@@ -12,8 +12,10 @@ use App\Policies\ReportPolicy;
 use App\Policies\StockPolicy;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -31,6 +33,19 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Carbon::setLocale(config('app.locale'));
+
+        if ($this->app->environment('production')) {
+            URL::forceScheme('https');
+            config(['session.secure' => true]);
+        }
+
+        Password::defaults(function () {
+            $rule = Password::min(8);
+
+            return $this->app->environment('production')
+                ? $rule->letters()->mixedCase()->numbers()->symbols()
+                : $rule;
+        });
 
         Gate::define('manageCatalog', [CatalogPolicy::class, 'manage']);
         Gate::define('viewStock', [StockPolicy::class, 'viewAny']);

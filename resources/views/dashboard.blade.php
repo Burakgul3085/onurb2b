@@ -139,6 +139,12 @@
                     <p class="mt-2 text-lg font-semibold text-ink">{{ __('Threads with dealers') }}</p>
                 </a>
             @endcan
+            @can('viewAny', App\Models\AuditLog::class)
+                <a href="{{ route('audit-logs.index') }}" class="card block p-6 transition hover:-translate-y-0.5 hover:shadow-md">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-ink-muted">{{ __('Audit log') }}</p>
+                    <p class="mt-2 text-lg font-semibold text-ink">{{ __('Sign-ins, prices, stock, and ledger') }}</p>
+                </a>
+            @endcan
             @can('viewReports')
                 <a href="{{ route('reports.index') }}" class="card block p-6 transition hover:-translate-y-0.5 hover:shadow-md">
                     <p class="text-xs font-semibold uppercase tracking-wide text-ink-muted">{{ __('Reports') }}</p>

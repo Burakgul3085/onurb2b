@@ -33,7 +33,7 @@ class ProductRules
             'critical_stock' => ['required', 'integer', 'min:0', 'lte:minimum_stock'],
             'description' => ['nullable', 'string', 'max:5000'],
             'barcodes' => ['nullable', 'string', 'max:5000'],
-            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'extensions:jpg,jpeg,png,webp', 'max:2048'],
         ];
     }
 

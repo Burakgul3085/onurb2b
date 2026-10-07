@@ -2,7 +2,9 @@
 
 namespace App\Actions\Orders;
 
+use App\Actions\Audit\RecordAudit;
 use App\Actions\Stock\RecordStockMovement;
+use App\Enums\AuditAction;
 use App\Enums\OrderStatus;
 use App\Exceptions\OrderException;
 use App\Models\Order;
@@ -22,6 +24,8 @@ class CancelOrder
             if (! $order->status->canCancel()) {
                 throw new OrderException(__('This order can no longer be cancelled.'));
             }
+
+            $previous = $order->status->value;
 
             if (in_array($order->status, [OrderStatus::Approved, OrderStatus::Preparing], true)) {
                 $warehouse = $order->warehouse;
@@ -43,6 +47,15 @@ class CancelOrder
                 'cancelled_by' => $actor->id,
                 'cancellation_reason' => trim($reason),
             ]);
+
+            app(RecordAudit::class)->write(
+                AuditAction::OrderCancelled,
+                $order,
+                $order->number,
+                ['status' => $previous],
+                ['status' => OrderStatus::Cancelled->value, 'reason' => trim($reason)],
+                $actor,
+            );
 
             return $order->refresh();
         });

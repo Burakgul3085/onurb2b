@@ -2,6 +2,8 @@
 
 namespace App\Actions\Users;
 
+use App\Actions\Audit\RecordAudit;
+use App\Enums\AuditAction;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
@@ -23,6 +25,16 @@ class CreateUser
             ]);
 
             $user->syncRoles($data['roles']);
+
+            app(RecordAudit::class)->write(AuditAction::UserSaved, $user, $user->email, [], [
+                'name' => $user->name,
+                'email' => $user->email,
+                'is_active' => $user->is_active,
+                'dealer_id' => $user->dealer_id,
+            ]);
+            app(RecordAudit::class)->write(AuditAction::PermissionChanged, $user, $user->email, [], [
+                'roles' => array_values($data['roles']),
+            ]);
 
             return $user;
         });

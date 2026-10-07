@@ -2,6 +2,8 @@
 
 namespace App\Actions\Prices;
 
+use App\Actions\Audit\RecordAudit;
+use App\Enums\AuditAction;
 use App\Models\DealerPrice;
 use App\Models\PriceList;
 use App\Models\PriceListItem;
@@ -16,9 +18,13 @@ class SavePriceRecord
     public function forList(PriceList $priceList, array $data, ?PriceListItem $item = null): PriceListItem
     {
         $item ??= new PriceListItem(['price_list_id' => $priceList->id]);
+        $before = $item->exists ? $this->priceSnapshot($item) : [];
         $item->fill($this->attributes($data, $item->exists));
         $item->price_list_id = $priceList->id;
         $item->save();
+        $item->loadMissing('product');
+
+        app(RecordAudit::class)->write(AuditAction::PriceSaved, $item, $item->product?->sku, $before, $this->priceSnapshot($item));
 
         return $item;
     }
@@ -29,9 +35,13 @@ class SavePriceRecord
     public function forDealer(int $dealerId, array $data, ?DealerPrice $price = null): DealerPrice
     {
         $price ??= new DealerPrice(['dealer_id' => $dealerId]);
+        $before = $price->exists ? $this->priceSnapshot($price) : [];
         $price->fill($this->attributes($data, $price->exists));
         $price->dealer_id = $dealerId;
         $price->save();
+        $price->loadMissing('product');
+
+        app(RecordAudit::class)->write(AuditAction::PriceSaved, $price, $price->product?->sku, $before, $this->priceSnapshot($price));
 
         return $price;
     }
@@ -64,5 +74,18 @@ class SavePriceRecord
         }
 
         return $attributes;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function priceSnapshot(PriceListItem|DealerPrice $record): array
+    {
+        return [
+            'product_id' => $record->product_id,
+            'price' => (string) $record->price,
+            'discount_percent' => (string) $record->discount_percent,
+            'is_active' => (bool) $record->is_active,
+        ];
     }
 }

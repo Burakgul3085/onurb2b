@@ -395,5 +395,19 @@
     "Total purchases": "Toplam alış",
     "Recent messages": "Son mesajlar",
     "Last order": "Son sipariş",
-    "No dashboard data for this period.": "Bu dönemde kayıt yok."
+    "No dashboard data for this period.": "Bu dönemde kayıt yok.",
+    "Audit log": "Denetim kaydı",
+    "Action": "Eylem",
+    "Entity": "Varlık",
+    "Entity number": "Varlık no",
+    "Old value": "Eski değer",
+    "New value": "Yeni değer",
+    "IP address": "IP",
+    "User agent": "Tarayıcı",
+    "When": "Zaman",
+    "User": "Kullanıcı",
+    "All actions": "Tüm eylemler",
+    "Apply filter": "Filtrele",
+    "No audit records yet.": "Henüz denetim kaydı yok.",
+    "Sign-ins, prices, stock, and ledger": "Giriş, fiyat, stok ve cari"
 }
