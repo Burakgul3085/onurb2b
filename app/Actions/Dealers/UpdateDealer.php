@@ -18,6 +18,10 @@ class UpdateDealer
         return DB::transaction(function () use ($dealer, $data) {
             $attributes = DealerData::fromArray($data)->toAttributes();
 
+            if (array_key_exists('price_list_id', $data)) {
+                $attributes['price_list_id'] = $data['price_list_id'] ?: null;
+            }
+
             if (array_key_exists('is_active', $data)) {
                 $isActive = filter_var($data['is_active'], FILTER_VALIDATE_BOOLEAN);
 

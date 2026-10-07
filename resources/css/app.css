@@ -1,3 +1,96 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+[x-cloak] {
+    display: none !important;
+}
+
+@layer base {
+    input[type='checkbox'],
+    input[type='radio'] {
+        @apply rounded border-stone-300 text-ink shadow-sm focus:ring-brass;
+    }
+}
+
+@layer components {
+    .field {
+        @apply block w-full rounded-lg border-stone-300 bg-white text-sm text-ink shadow-sm placeholder:text-stone-400 focus:border-brass focus:ring-brass;
+    }
+
+    .btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-40;
+    }
+
+    .btn-primary {
+        @apply btn bg-ink text-white shadow-sm hover:bg-ink-soft focus:ring-brass;
+    }
+
+    .btn-secondary {
+        @apply btn border border-stone-300 bg-white text-ink shadow-sm hover:bg-stone-50 focus:ring-brass;
+    }
+
+    .btn-danger {
+        @apply btn bg-rose-700 text-white shadow-sm hover:bg-rose-800 focus:ring-rose-400;
+    }
+
+    .card {
+        @apply overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm;
+    }
+
+    .link {
+        @apply text-sm font-semibold text-brass hover:text-ink;
+    }
+
+    .chip {
+        @apply inline-flex items-center rounded-full border border-stone-200 bg-white px-3 py-1 text-sm font-medium text-ink-muted hover:border-stone-300 hover:text-ink;
+    }
+
+    .chip-on {
+        @apply border-ink bg-ink text-white hover:text-white;
+    }
+
+    .badge {
+        @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold;
+    }
+
+    .badge-on {
+        @apply bg-emerald-100 text-emerald-800;
+    }
+
+    .badge-off {
+        @apply bg-stone-200 text-stone-600;
+    }
+
+    .badge-wait {
+        @apply bg-amber-100 text-amber-800;
+    }
+
+    .data-table {
+        @apply min-w-full text-sm;
+    }
+
+    .data-table thead th {
+        @apply whitespace-nowrap border-b border-stone-200 py-3 pe-4 text-left text-xs font-semibold uppercase tracking-wide text-ink-muted;
+    }
+
+    .data-table tbody td {
+        @apply py-3 pe-4 align-middle text-ink;
+    }
+
+    .data-table tbody tr {
+        @apply border-b border-stone-100 last:border-0;
+    }
+
+    .data-table tbody tr:hover {
+        @apply bg-paper/70;
+    }
+
+    .form-section {
+        @apply text-xs font-semibold uppercase tracking-wide text-ink-muted;
+    }
+
+    .stat {
+        @apply rounded-xl bg-paper px-4 py-3;
+    }
+}

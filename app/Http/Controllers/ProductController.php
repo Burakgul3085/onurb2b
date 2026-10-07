@@ -12,6 +12,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Unit;
+use App\Services\Pricing\PriceResolver;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,7 +20,7 @@ use Illuminate\View\View;
 
 class ProductController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, PriceResolver $prices): View
     {
         $this->authorize('viewAny', Product::class);
 
@@ -41,10 +42,18 @@ class ProductController extends Controller
             ->paginate(15)
             ->withQueryString();
 
+        $quotes = null;
+
+        if ($actor->dealer_id !== null) {
+            $actor->loadMissing('dealer.priceList');
+            $quotes = $prices->quoteMany($actor->dealer, $products->getCollection(), 1);
+        }
+
         return view('products.index', [
             'products' => $products,
             'search' => $search,
             'showsCosts' => $this->showsCosts($request),
+            'quotes' => $quotes,
         ]);
     }
 
@@ -62,15 +71,23 @@ class ProductController extends Controller
         return redirect()->route('products.show', $product)->with('status', __('Product saved.'));
     }
 
-    public function show(Request $request, Product $product): View
+    public function show(Request $request, Product $product, PriceResolver $prices): View
     {
         $this->authorize('view', $product);
 
         $product->load(['brand', 'category.parent', 'unit', 'barcodes']);
+        $actor = $request->user();
+        $quote = null;
+
+        if ($actor->dealer_id !== null) {
+            $actor->loadMissing('dealer.priceList');
+            $quote = $prices->quote($actor->dealer, $product, 1);
+        }
 
         return view('products.show', [
             'product' => $product,
             'showsCosts' => $this->showsCosts($request),
+            'quote' => $quote,
         ]);
     }
 

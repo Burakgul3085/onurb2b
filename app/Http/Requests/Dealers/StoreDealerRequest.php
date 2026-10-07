@@ -4,6 +4,7 @@ namespace App\Http\Requests\Dealers;
 
 use App\Models\Dealer;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreDealerRequest extends FormRequest
 {
@@ -19,7 +20,10 @@ class StoreDealerRequest extends FormRequest
      */
     public function rules(): array
     {
-        return DealerRules::fields();
+        return [
+            ...DealerRules::fields(),
+            'price_list_id' => ['nullable', 'integer', Rule::exists('price_lists', 'id')],
+        ];
     }
 
     /**

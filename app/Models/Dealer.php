@@ -33,6 +33,7 @@ class Dealer extends Model
         'delivery_address',
         'billing_address',
         'payment_term_days',
+        'price_list_id',
         'notes',
         'application_status',
         'rejection_reason',
@@ -61,6 +62,22 @@ class Dealer extends Model
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
+    }
+
+    /**
+     * @return BelongsTo<PriceList, $this>
+     */
+    public function priceList(): BelongsTo
+    {
+        return $this->belongsTo(PriceList::class);
+    }
+
+    /**
+     * @return HasMany<DealerPrice, $this>
+     */
+    public function prices(): HasMany
+    {
+        return $this->hasMany(DealerPrice::class);
     }
 
     /**

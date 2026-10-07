@@ -4,6 +4,7 @@ namespace App\Http\Requests\Dealers;
 
 use App\Models\Dealer;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateDealerRequest extends FormRequest
 {
@@ -26,6 +27,7 @@ class UpdateDealerRequest extends FormRequest
         return [
             ...DealerRules::fields($dealer instanceof Dealer ? $dealer->id : null),
             'is_active' => ['sometimes', 'boolean'],
+            'price_list_id' => ['nullable', 'integer', Rule::exists('price_lists', 'id')],
         ];
     }
 

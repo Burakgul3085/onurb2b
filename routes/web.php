@@ -1,13 +1,19 @@
 <?php
 
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DealerApplicationController;
 use App\Http\Controllers\DealerController;
+use App\Http\Controllers\DealerPriceController;
+use App\Http\Controllers\PriceListController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\StockController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WarehouseController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -37,7 +43,20 @@ Route::middleware('auth')->group(function () {
     Route::get('/dealers/{dealer}/edit', [DealerController::class, 'edit'])->name('dealers.edit');
     Route::patch('/dealers/{dealer}', [DealerController::class, 'update'])->name('dealers.update');
     Route::post('/dealers/{dealer}/approve', [DealerController::class, 'approve'])->name('dealers.approve');
+    Route::get('/dealers/{dealer}/prices', [DealerPriceController::class, 'index'])->name('dealers.prices.index');
+    Route::post('/dealers/{dealer}/prices', [DealerPriceController::class, 'store'])->name('dealers.prices.store');
+    Route::get('/dealers/{dealer}/prices/{dealerPrice}/edit', [DealerPriceController::class, 'edit'])->name('dealers.prices.edit');
+    Route::patch('/dealers/{dealer}/prices/{dealerPrice}', [DealerPriceController::class, 'update'])->name('dealers.prices.update');
     Route::post('/dealers/{dealer}/reject', [DealerController::class, 'reject'])->name('dealers.reject');
+
+    Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
+    Route::post('/catalog/quick-order', [CatalogController::class, 'quickOrder'])->name('catalog.quick-order');
+
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
+    Route::patch('/cart/items/{item}', [CartController::class, 'update'])->name('cart.items.update');
+    Route::delete('/cart/items/{item}', [CartController::class, 'destroy'])->name('cart.items.destroy');
+    Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
 
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
@@ -55,6 +74,25 @@ Route::middleware('auth')->group(function () {
     Route::post('/categories', [CategoryController::class, 'store'])->name('categories.store');
     Route::get('/categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
     Route::patch('/categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
+
+    Route::get('/warehouses', [WarehouseController::class, 'index'])->name('warehouses.index');
+    Route::post('/warehouses', [WarehouseController::class, 'store'])->name('warehouses.store');
+    Route::get('/warehouses/{warehouse}/edit', [WarehouseController::class, 'edit'])->name('warehouses.edit');
+    Route::patch('/warehouses/{warehouse}', [WarehouseController::class, 'update'])->name('warehouses.update');
+
+    Route::get('/price-lists', [PriceListController::class, 'index'])->name('price-lists.index');
+    Route::post('/price-lists', [PriceListController::class, 'store'])->name('price-lists.store');
+    Route::get('/price-lists/{priceList}', [PriceListController::class, 'show'])->name('price-lists.show');
+    Route::get('/price-lists/{priceList}/edit', [PriceListController::class, 'edit'])->name('price-lists.edit');
+    Route::patch('/price-lists/{priceList}', [PriceListController::class, 'update'])->name('price-lists.update');
+    Route::post('/price-lists/{priceList}/items', [PriceListController::class, 'storeItem'])->name('price-lists.items.store');
+    Route::get('/price-lists/{priceList}/items/{item}/edit', [PriceListController::class, 'editItem'])->name('price-lists.items.edit');
+    Route::patch('/price-lists/{priceList}/items/{item}', [PriceListController::class, 'updateItem'])->name('price-lists.items.update');
+
+    Route::get('/stock', [StockController::class, 'index'])->name('stock.index');
+    Route::get('/stock/movements', [StockController::class, 'movements'])->name('stock.movements');
+    Route::get('/stock/create', [StockController::class, 'create'])->name('stock.create');
+    Route::post('/stock', [StockController::class, 'store'])->name('stock.store');
 
     Route::get('/units', [UnitController::class, 'index'])->name('units.index');
     Route::post('/units', [UnitController::class, 'store'])->name('units.store');

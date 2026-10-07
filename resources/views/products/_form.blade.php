@@ -6,6 +6,10 @@
     $barcodeText = old('barcodes', $product ? $product->barcodes->pluck('barcode')->implode("\n") : '');
 @endphp
 
+<div class="sm:col-span-2">
+    <h3 class="form-section">{{ __('Catalog details') }}</h3>
+</div>
+
 <div>
     <x-input-label for="sku" value="SKU" />
     <x-text-input id="sku" name="sku" type="text" class="mt-1 block w-full" :value="old('sku', $product?->sku)" required />
@@ -20,7 +24,7 @@
 
 <div>
     <x-input-label for="brand_id" :value="__('Brand')" />
-    <select id="brand_id" name="brand_id" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full" required>
+    <select id="brand_id" name="brand_id" class="field mt-1" required>
         <option value="">{{ __('Select') }}</option>
         @foreach ($brands as $brand)
             <option value="{{ $brand->id }}" @selected((string) old('brand_id', $product?->brand_id) === (string) $brand->id)>{{ $brand->name }}</option>
@@ -31,7 +35,7 @@
 
 <div>
     <x-input-label for="category_id" :value="__('Category')" />
-    <select id="category_id" name="category_id" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full" required>
+    <select id="category_id" name="category_id" class="field mt-1" required>
         <option value="">{{ __('Select') }}</option>
         @foreach ($categories as $category)
             <option value="{{ $category->id }}" @selected((string) $selectedCategory === (string) $category->id)>{{ $category->name }}</option>
@@ -42,7 +46,7 @@
 
 <div>
     <x-input-label for="subcategory_id" :value="__('Subcategory')" />
-    <select id="subcategory_id" name="subcategory_id" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full">
+    <select id="subcategory_id" name="subcategory_id" class="field mt-1">
         <option value="">{{ __('No subcategory') }}</option>
         @foreach ($subcategories as $subcategory)
             <option value="{{ $subcategory->id }}" @selected((string) $selectedSubcategory === (string) $subcategory->id)>{{ $subcategory->label() }}</option>
@@ -53,7 +57,7 @@
 
 <div>
     <x-input-label for="unit_id" :value="__('Unit')" />
-    <select id="unit_id" name="unit_id" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full" required>
+    <select id="unit_id" name="unit_id" class="field mt-1" required>
         <option value="">{{ __('Select') }}</option>
         @foreach ($units as $unit)
             <option value="{{ $unit->id }}" @selected((string) old('unit_id', $product?->unit_id) === (string) $unit->id)>{{ $unit->name }}</option>
@@ -62,14 +66,29 @@
     <x-input-error class="mt-2" :messages="$errors->get('unit_id')" />
 </div>
 
+<div class="sm:col-span-2 mt-2">
+    <h3 class="form-section">{{ __('Pricing') }}</h3>
+</div>
+
 <div>
     <x-input-label for="vat_rate" :value="__('VAT rate')" />
-    <select id="vat_rate" name="vat_rate" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full" required>
+    <select id="vat_rate" name="vat_rate" class="field mt-1" required>
         @foreach ($vatRates as $vatRate)
             <option value="{{ $vatRate->value }}" @selected((string) old('vat_rate', $product?->vat_rate?->value ?? '20') === $vatRate->value)>{{ $vatRate->label() }}</option>
         @endforeach
     </select>
     <x-input-error class="mt-2" :messages="$errors->get('vat_rate')" />
+</div>
+
+<div class="flex items-end">
+    <div>
+        <input type="hidden" name="prices_include_vat" value="0">
+        <label class="flex items-center gap-2 text-sm text-ink">
+            <input type="checkbox" name="prices_include_vat" value="1" @checked($pricesIncludeVat)>
+            {{ __('Prices include VAT') }}
+        </label>
+        <x-input-error class="mt-2" :messages="$errors->get('prices_include_vat')" />
+    </div>
 </div>
 
 <div>
@@ -84,13 +103,8 @@
     <x-input-error class="mt-2" :messages="$errors->get('sale_price')" />
 </div>
 
-<div>
-    <input type="hidden" name="prices_include_vat" value="0">
-    <label class="flex items-center gap-2 text-sm text-gray-700">
-        <input type="checkbox" name="prices_include_vat" value="1" @checked($pricesIncludeVat)>
-        {{ __('Prices include VAT') }}
-    </label>
-    <x-input-error class="mt-2" :messages="$errors->get('prices_include_vat')" />
+<div class="sm:col-span-2 mt-2">
+    <h3 class="form-section">{{ __('Stock and barcodes') }}</h3>
 </div>
 
 <div>
@@ -105,21 +119,21 @@
     <x-input-error class="mt-2" :messages="$errors->get('critical_stock')" />
 </div>
 
-<div>
+<div class="sm:col-span-2">
     <x-input-label for="barcodes" :value="__('Barcodes')" />
-    <textarea id="barcodes" name="barcodes" rows="3" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full" placeholder="{{ __('One barcode per line') }}">{{ $barcodeText }}</textarea>
+    <textarea id="barcodes" name="barcodes" rows="3" class="field mt-1" placeholder="{{ __('One barcode per line') }}">{{ $barcodeText }}</textarea>
     <x-input-error class="mt-2" :messages="$errors->get('barcodes')" />
 </div>
 
-<div>
+<div class="sm:col-span-2">
     <x-input-label for="description" :value="__('Description')" />
-    <textarea id="description" name="description" rows="3" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full">{{ old('description', $product?->description) }}</textarea>
+    <textarea id="description" name="description" rows="3" class="field mt-1">{{ old('description', $product?->description) }}</textarea>
     <x-input-error class="mt-2" :messages="$errors->get('description')" />
 </div>
 
-<div>
+<div class="sm:col-span-2">
     <x-input-label for="image" :value="__('Image')" />
-    <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp" class="mt-1 block w-full text-sm">
+    <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp" class="mt-1 block w-full text-sm text-ink-muted">
     <x-input-error class="mt-2" :messages="$errors->get('image')" />
 </div>
 
@@ -128,9 +142,9 @@
         $activeValue = old('is_active', $product->is_active ? '1' : '0');
         $isActive = $activeValue === true || $activeValue === 1 || $activeValue === '1';
     @endphp
-    <div>
+    <div class="sm:col-span-2">
         <input type="hidden" name="is_active" value="0">
-        <label class="flex items-center gap-2 text-sm text-gray-700">
+        <label class="flex items-center gap-2 text-sm text-ink">
             <input type="checkbox" name="is_active" value="1" @checked($isActive)>
             {{ __('Active') }}
         </label>

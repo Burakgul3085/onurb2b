@@ -13,6 +13,7 @@ use App\Http\Requests\Dealers\RejectDealerRequest;
 use App\Http\Requests\Dealers\StoreDealerRequest;
 use App\Http\Requests\Dealers\UpdateDealerRequest;
 use App\Models\Dealer;
+use App\Models\PriceList;
 use App\Support\Authorization\DealerScope;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -56,6 +57,7 @@ class DealerController extends Controller
 
         return view('dealers.create', [
             'districts' => District::cases(),
+            'priceLists' => PriceList::query()->where('is_active', true)->orderBy('name')->get(),
         ]);
     }
 
@@ -72,7 +74,7 @@ class DealerController extends Controller
     {
         $this->authorize('view', $dealer);
 
-        $dealer->load('users');
+        $dealer->load(['users', 'priceList']);
 
         return view('dealers.show', [
             'dealer' => $dealer,
@@ -86,6 +88,16 @@ class DealerController extends Controller
         return view('dealers.edit', [
             'dealer' => $dealer,
             'districts' => District::cases(),
+            'priceLists' => PriceList::query()
+                ->where(function ($query) use ($dealer) {
+                    $query->where('is_active', true);
+
+                    if ($dealer->price_list_id !== null) {
+                        $query->orWhere('id', $dealer->price_list_id);
+                    }
+                })
+                ->orderBy('name')
+                ->get(),
         ]);
     }
 

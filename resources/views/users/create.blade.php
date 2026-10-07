@@ -1,19 +1,15 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Create user') }}
-        </h2>
+        <h2 class="text-2xl font-semibold tracking-tight text-ink">{{ __('Create user') }}</h2>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <form method="POST" action="{{ route('users.store') }}" class="p-6 space-y-6">
+    <div class="mx-auto max-w-3xl px-4 pb-10 sm:px-6 lg:px-8">
+        <div class="card">
+            <form method="POST" action="{{ route('users.store') }}" class="space-y-6 p-6 sm:p-8">
                     @csrf
                     @include('users._form', ['subject' => null, 'canChangeStatus' => true])
                     <x-primary-button>{{ __('Save') }}</x-primary-button>
-                </form>
-            </div>
+            </form>
         </div>
     </div>
 </x-app-layout>

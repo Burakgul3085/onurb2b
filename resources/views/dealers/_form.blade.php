@@ -40,8 +40,8 @@
 
 <div>
     <x-input-label for="district" :value="__('District')" />
-    <p class="mt-1 text-sm text-gray-600">{{ __('Province') }}: {{ \App\Models\Dealer::PROVINCE }}</p>
-    <select id="district" name="district" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full" required>
+    <p class="mt-1 text-sm text-ink-muted">{{ __('Province') }}: {{ \App\Models\Dealer::PROVINCE }}</p>
+    <select id="district" name="district" class="field mt-1" required>
         <option value="">{{ __('Select a district') }}</option>
         @foreach ($districts as $district)
             <option value="{{ $district->value }}" @selected($selectedDistrict === $district->value)>{{ $district->label() }}</option>
@@ -52,19 +52,19 @@
 
 <div>
     <x-input-label for="address" :value="__('Address')" />
-    <textarea id="address" name="address" rows="2" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full" required>{{ old('address', $dealer?->address) }}</textarea>
+    <textarea id="address" name="address" rows="2" class="field mt-1" required>{{ old('address', $dealer?->address) }}</textarea>
     <x-input-error class="mt-2" :messages="$errors->get('address')" />
 </div>
 
 <div>
     <x-input-label for="delivery_address" :value="__('Delivery address')" />
-    <textarea id="delivery_address" name="delivery_address" rows="2" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full" required>{{ old('delivery_address', $dealer?->delivery_address) }}</textarea>
+    <textarea id="delivery_address" name="delivery_address" rows="2" class="field mt-1" required>{{ old('delivery_address', $dealer?->delivery_address) }}</textarea>
     <x-input-error class="mt-2" :messages="$errors->get('delivery_address')" />
 </div>
 
 <div>
     <x-input-label for="billing_address" :value="__('Billing address')" />
-    <textarea id="billing_address" name="billing_address" rows="2" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full" required>{{ old('billing_address', $dealer?->billing_address) }}</textarea>
+    <textarea id="billing_address" name="billing_address" rows="2" class="field mt-1" required>{{ old('billing_address', $dealer?->billing_address) }}</textarea>
     <x-input-error class="mt-2" :messages="$errors->get('billing_address')" />
 </div>
 
@@ -74,9 +74,22 @@
     <x-input-error class="mt-2" :messages="$errors->get('payment_term_days')" />
 </div>
 
+@isset($priceLists)
+    <div>
+        <x-input-label for="price_list_id" :value="__('Price list')" />
+        <select id="price_list_id" name="price_list_id" class="field mt-1">
+            <option value="">{{ __('No price list') }}</option>
+            @foreach ($priceLists as $priceList)
+                <option value="{{ $priceList->id }}" @selected((string) old('price_list_id', $dealer?->price_list_id) === (string) $priceList->id)>{{ $priceList->name }}</option>
+            @endforeach
+        </select>
+        <x-input-error class="mt-2" :messages="$errors->get('price_list_id')" />
+    </div>
+@endisset
+
 <div>
     <x-input-label for="notes" :value="__('Notes')" />
-    <textarea id="notes" name="notes" rows="3" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full">{{ old('notes', $dealer?->notes) }}</textarea>
+    <textarea id="notes" name="notes" rows="3" class="field mt-1">{{ old('notes', $dealer?->notes) }}</textarea>
     <x-input-error class="mt-2" :messages="$errors->get('notes')" />
 </div>
 
@@ -87,7 +100,7 @@
     @endphp
     <div>
         <input type="hidden" name="is_active" value="0">
-        <label class="flex items-center gap-2 text-sm text-gray-700">
+        <label class="flex items-center gap-2 text-sm text-ink">
             <input type="checkbox" name="is_active" value="1" @checked($isActive)>
             {{ __('Active') }}
         </label>

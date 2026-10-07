@@ -8,21 +8,25 @@
         <title>{{ config('app.name', 'Laravel') }}</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700&display=swap" rel="stylesheet" />
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @livewireStyles
     </head>
-    <body class="font-sans text-gray-900 antialiased">
-        <div class="min-h-screen bg-gray-100">
-            <div class="max-w-3xl mx-auto px-4 py-8">
-                <div class="mb-6">
-                    <a href="{{ route('login') }}">
-                        <x-application-logo class="w-16 h-16 fill-current text-gray-500" />
+    <body class="bg-paper font-sans text-ink antialiased">
+        <div class="min-h-screen">
+            <header class="border-b border-stone-200 bg-white">
+                <div class="mx-auto flex max-w-3xl items-center justify-between px-4 py-4">
+                    <a href="{{ route('login') }}" class="inline-flex items-center gap-3">
+                        <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-ink text-sm font-bold text-white">OB</span>
+                        <span class="font-semibold tracking-tight">{{ config('app.name') }}</span>
                     </a>
+                    <a href="{{ route('login') }}" class="link">{{ __('Log in') }}</a>
                 </div>
+            </header>
 
-                <div class="bg-white shadow-sm sm:rounded-lg p-6">
+            <div class="mx-auto max-w-3xl px-4 py-8">
+                <div class="card p-6 sm:p-8">
                     {{ $slot }}
                 </div>
             </div>

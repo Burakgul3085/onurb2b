@@ -13,8 +13,14 @@ class CreateDealer
      */
     public function execute(array $data): Dealer
     {
+        $attributes = DealerData::fromArray($data)->toAttributes();
+
+        if (array_key_exists('price_list_id', $data)) {
+            $attributes['price_list_id'] = $data['price_list_id'] ?: null;
+        }
+
         return Dealer::query()->create([
-            ...DealerData::fromArray($data)->toAttributes(),
+            ...$attributes,
             'application_status' => DealerApplicationStatus::Pending,
             'is_active' => false,
         ]);

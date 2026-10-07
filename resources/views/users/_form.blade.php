@@ -28,10 +28,10 @@
 </div>
 
 <fieldset>
-    <legend class="text-sm font-medium text-gray-700">{{ __('Roles') }}</legend>
+    <legend class="form-section">{{ __('Roles') }}</legend>
     <div class="mt-2 space-y-2">
         @foreach ($roles as $role)
-            <label class="flex items-center gap-2 text-sm text-gray-700">
+            <label class="flex items-center gap-2 text-sm text-ink">
                 <input type="checkbox" name="roles[]" value="{{ $role->value }}" @checked(in_array($role->value, $selectedRoles, true))>
                 {{ $role->label() }}
             </label>
@@ -44,12 +44,12 @@
 @if ($canChangeStatus)
     <div>
         <input type="hidden" name="is_active" value="0">
-        <label class="flex items-center gap-2 text-sm text-gray-700">
+        <label class="flex items-center gap-2 text-sm text-ink">
             <input type="checkbox" name="is_active" value="1" @checked($isActive)>
             {{ __('Active') }}
         </label>
         <x-input-error class="mt-2" :messages="$errors->get('is_active')" />
     </div>
 @elseif ($subject)
-    <p class="text-sm text-gray-600">{{ __('Status') }}: {{ $subject->is_active ? __('Active') : __('Inactive') }}</p>
+    <p class="text-sm text-ink-muted">{{ __('Status') }}: {{ $subject->is_active ? __('Active') : __('Inactive') }}</p>
 @endif

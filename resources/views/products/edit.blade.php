@@ -1,17 +1,18 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ __('Edit product') }}</h2>
+        <div>
+            <h2 class="text-2xl font-semibold tracking-tight text-ink">{{ __('Edit product') }}</h2>
+            <div class="mt-3"><x-catalog-nav /></div>
+        </div>
     </x-slot>
-    <div class="py-12">
-        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white shadow-sm sm:rounded-lg">
-                <form method="POST" action="{{ route('products.update', $product) }}" enctype="multipart/form-data" class="p-6 space-y-6">
+    <div class="mx-auto max-w-3xl px-4 pb-10 sm:px-6 lg:px-8">
+        <div class="card">
+            <form method="POST" action="{{ route('products.update', $product) }}" enctype="multipart/form-data" class="grid gap-5 p-6 sm:grid-cols-2 sm:p-8">
                     @csrf
                     @method('PATCH')
                     @include('products._form')
-                    <x-primary-button>{{ __('Save') }}</x-primary-button>
-                </form>
-            </div>
+                    <div class="sm:col-span-2"><x-primary-button>{{ __('Save') }}</x-primary-button></div>
+            </form>
         </div>
     </div>
 </x-app-layout>
