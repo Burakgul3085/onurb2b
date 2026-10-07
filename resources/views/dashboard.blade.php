@@ -50,6 +50,12 @@
                     <p class="mt-2 text-lg font-semibold text-ink">{{ __('Catalog, prices, and barcodes') }}</p>
                 </a>
             @endcan
+            @can('viewAny', App\Models\Delivery::class)
+                <a href="{{ route('deliveries.index') }}" class="card block p-6 transition hover:-translate-y-0.5 hover:shadow-md">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-ink-muted">{{ __('Deliveries') }}</p>
+                    <p class="mt-2 text-lg font-semibold text-ink">{{ __('Eskişehir delivery route') }}</p>
+                </a>
+            @endcan
             @can('viewAny', App\Models\Order::class)
                 <a href="{{ route('orders.index') }}" class="card block p-6 transition hover:-translate-y-0.5 hover:shadow-md">
                     <p class="text-xs font-semibold uppercase tracking-wide text-ink-muted">{{ __('Orders') }}</p>

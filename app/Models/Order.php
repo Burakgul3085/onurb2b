@@ -107,4 +107,12 @@ class Order extends Model
     {
         return $this->hasMany(OrderLine::class);
     }
+
+    /**
+     * @return HasMany<Delivery, $this>
+     */
+    public function deliveries(): HasMany
+    {
+        return $this->hasMany(Delivery::class);
+    }
 }

@@ -11,6 +11,7 @@ use App\Exceptions\OrderException;
 use App\Http\Requests\Orders\ApproveOrderRequest;
 use App\Http\Requests\Orders\CancelOrderRequest;
 use App\Http\Requests\Orders\PlaceOrderRequest;
+use App\Models\Delivery;
 use App\Models\Order;
 use App\Models\StockLevel;
 use App\Models\Warehouse;
@@ -58,7 +59,7 @@ class OrderController extends Controller
     {
         abort_unless($request->user()?->can('view', $order), 404);
 
-        $order->load(['lines', 'dealer', 'warehouse', 'user', 'approver', 'canceller']);
+        $order->load(['lines', 'dealer', 'warehouse', 'user', 'approver', 'canceller', 'deliveries.driver']);
         $warehouses = Warehouse::query()->where('is_active', true)->orderBy('name')->get();
         $warehouse = $this->selectedWarehouse($request, $warehouses, $order);
 
@@ -69,6 +70,12 @@ class OrderController extends Controller
             'availability' => $warehouse === null ? [] : $this->availability($warehouse, $order),
             'canApprove' => $request->user()->can('approve', $order),
             'canCancel' => $request->user()->can('cancel', $order),
+            'canScheduleDelivery' => $request->user()->can('create', Delivery::class) && in_array($order->status, [
+                OrderStatus::Approved,
+                OrderStatus::Preparing,
+                OrderStatus::PartiallyDelivered,
+                OrderStatus::DeliveryFailed,
+            ], true),
         ]);
     }
 

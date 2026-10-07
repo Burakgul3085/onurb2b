@@ -7,6 +7,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DealerApplicationController;
 use App\Http\Controllers\DealerController;
 use App\Http\Controllers\DealerPriceController;
+use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PriceListController;
 use App\Http\Controllers\ProductController;
@@ -49,6 +50,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/dealers/{dealer}/prices/{dealerPrice}/edit', [DealerPriceController::class, 'edit'])->name('dealers.prices.edit');
     Route::patch('/dealers/{dealer}/prices/{dealerPrice}', [DealerPriceController::class, 'update'])->name('dealers.prices.update');
     Route::post('/dealers/{dealer}/reject', [DealerController::class, 'reject'])->name('dealers.reject');
+
+    Route::get('/deliveries', [DeliveryController::class, 'index'])->name('deliveries.index');
+    Route::get('/deliveries/create', [DeliveryController::class, 'create'])->name('deliveries.create');
+    Route::post('/deliveries', [DeliveryController::class, 'store'])->name('deliveries.store');
+    Route::get('/deliveries/{delivery}', [DeliveryController::class, 'show'])->name('deliveries.show');
+    Route::post('/deliveries/{delivery}/dispatch', [DeliveryController::class, 'dispatch'])->name('deliveries.dispatch');
+    Route::post('/deliveries/{delivery}/complete', [DeliveryController::class, 'complete'])->name('deliveries.complete');
+    Route::post('/deliveries/{delivery}/fail', [DeliveryController::class, 'fail'])->name('deliveries.fail');
+    Route::delete('/deliveries/{delivery}', [DeliveryController::class, 'destroy'])->name('deliveries.destroy');
 
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');

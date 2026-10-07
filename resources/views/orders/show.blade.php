@@ -29,6 +29,23 @@
             @endif
         </div>
 
+        <div class="card space-y-3 p-6 text-sm">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <h3 class="font-semibold text-ink">{{ __('Deliveries') }}</h3>
+                @if ($canScheduleDelivery)
+                    <a class="link" href="{{ route('deliveries.create', ['order' => $order->id]) }}">{{ __('Plan delivery') }}</a>
+                @endif
+            </div>
+            @forelse ($order->deliveries as $delivery)
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <span>{{ $delivery->scheduled_on->format('d.m.Y') }} {{ $delivery->scheduled_time ? substr((string) $delivery->scheduled_time, 0, 5) : '' }} · {{ $delivery->driver->name }} · {{ $delivery->sequence }}@if ($delivery->recipient_name) · {{ $delivery->recipient_name }}@endif</span>
+                    <x-badge :tone="$delivery->status->tone()">{{ $delivery->status->label() }}</x-badge>
+                </div>
+            @empty
+                <p class="text-ink-muted">{{ __('No deliveries yet.') }}</p>
+            @endforelse
+        </div>
+
         <div class="card overflow-x-auto p-6">
             <table class="data-table">
                 <thead>
