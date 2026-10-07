@@ -99,8 +99,39 @@
                     <span>{{ \App\Support\Money\Money::format($summary->payable) }} ₺</span>
                 </div>
                 <p class="text-xs text-ink-muted">{{ __('Document discount is applied once to the cart total, not inside the unit price.') }}</p>
-                <p class="text-xs text-ink-muted">{{ __('Sending the order comes later.') }}</p>
+                <p class="text-xs text-ink-muted">{{ __('Sending the order does not reserve stock.') }}</p>
             </div>
         </div>
+
+        @php($canSend = collect($summary->lines)->isNotEmpty() && collect($summary->lines)->every(fn ($line) => $line->sellable))
+        @if ($canSend)
+            <form method="POST" action="{{ route('orders.store') }}" class="card space-y-4 p-6">
+                @csrf
+                <h3 class="font-semibold text-ink">{{ __('Send order') }}</h3>
+                <div>
+                    <x-input-label for="district" :value="__('District')" />
+                    <select id="district" name="district" class="field mt-1" required>
+                        @foreach ($districts as $district)
+                            <option value="{{ $district->value }}" @selected(old('district', $dealer->district->value) === $district->value)>{{ $district->label() }}</option>
+                        @endforeach
+                    </select>
+                    <x-input-error class="mt-2" :messages="$errors->get('district')" />
+                </div>
+                <div>
+                    <x-input-label for="delivery_address" :value="__('Delivery address')" />
+                    <textarea id="delivery_address" name="delivery_address" class="field mt-1" rows="3" required>{{ old('delivery_address', $dealer->delivery_address) }}</textarea>
+                    <x-input-error class="mt-2" :messages="$errors->get('delivery_address')" />
+                </div>
+                <div>
+                    <x-input-label for="note" :value="__('Note')" />
+                    <textarea id="note" name="note" class="field mt-1" rows="2">{{ old('note') }}</textarea>
+                    <x-input-error class="mt-2" :messages="$errors->get('note')" />
+                </div>
+                <x-input-error :messages="$errors->get('order')" />
+                <x-primary-button>{{ __('Send order') }}</x-primary-button>
+            </form>
+        @elseif (collect($summary->lines)->contains(fn ($line) => ! $line->sellable))
+            <p class="text-sm text-rose-700">{{ __('Remove products that are not for sale before sending the order.') }}</p>
+        @endif
     </div>
 </x-app-layout>

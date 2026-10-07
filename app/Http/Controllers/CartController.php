@@ -6,6 +6,7 @@ use App\Actions\Cart\AddCartItem;
 use App\Actions\Cart\ClearCart;
 use App\Actions\Cart\RemoveCartItem;
 use App\Actions\Cart\UpdateCartItem;
+use App\Enums\District;
 use App\Exceptions\CartException;
 use App\Http\Requests\Cart\StoreCartItemRequest;
 use App\Http\Requests\Cart\UpdateCartItemRequest;
@@ -34,6 +35,7 @@ class CartController extends Controller
         return view('cart.index', [
             'dealer' => $dealer,
             'summary' => $calculator->summarize($cart, $dealer),
+            'districts' => District::cases(),
         ]);
     }
 

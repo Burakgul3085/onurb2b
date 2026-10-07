@@ -233,7 +233,7 @@ test('document discount is applied once to the cart gross', function () {
         ->assertSee('120,00')
         ->assertSee('12,00')
         ->assertSee('108,00')
-        ->assertSee(__('Sending the order comes later.'));
+        ->assertSee(__('Sending the order does not reserve stock.'));
 });
 
 test('another dealer cannot see or change the cart and an inactive line drops out of the total', function () {

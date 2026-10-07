@@ -43,6 +43,11 @@
                             {{ __('Stock') }}
                         </x-nav-link>
                     @endcan
+                    @can('viewAny', App\Models\Order::class)
+                        <x-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
+                            {{ __('Orders') }}
+                        </x-nav-link>
+                    @endcan
                     @can('viewPrices')
                         <x-nav-link :href="route('price-lists.index')" :active="request()->routeIs('price-lists.*')">
                             {{ __('Price lists') }}
@@ -119,6 +124,11 @@
             @elsecan('viewAny', App\Models\Product::class)
                 <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*', 'brands.*', 'categories.*', 'units.*')">
                     {{ __('Products') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('viewAny', App\Models\Order::class)
+                <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
+                    {{ __('Orders') }}
                 </x-responsive-nav-link>
             @endcan
             @can('viewStock')

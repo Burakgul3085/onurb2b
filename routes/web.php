@@ -7,6 +7,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DealerApplicationController;
 use App\Http\Controllers\DealerController;
 use App\Http\Controllers\DealerPriceController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PriceListController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
@@ -48,6 +49,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/dealers/{dealer}/prices/{dealerPrice}/edit', [DealerPriceController::class, 'edit'])->name('dealers.prices.edit');
     Route::patch('/dealers/{dealer}/prices/{dealerPrice}', [DealerPriceController::class, 'update'])->name('dealers.prices.update');
     Route::post('/dealers/{dealer}/reject', [DealerController::class, 'reject'])->name('dealers.reject');
+
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{order}/approve', [OrderController::class, 'approve'])->name('orders.approve');
+    Route::post('/orders/{order}/prepare', [OrderController::class, 'prepare'])->name('orders.prepare');
+    Route::post('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 
     Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index');
     Route::post('/catalog/quick-order', [CatalogController::class, 'quickOrder'])->name('catalog.quick-order');
