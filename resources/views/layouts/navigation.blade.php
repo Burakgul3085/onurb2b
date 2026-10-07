@@ -1,117 +1,165 @@
+@php
+    $user = Auth::user();
+
+    $link = function (string $label, string $href, bool $active): array {
+        return ['label' => $label, 'href' => $href, 'active' => $active];
+    };
+
+    $sales = [];
+
+    if ($user->can('viewAny', App\Models\Dealer::class) && ! $user->dealer_id) {
+        $sales[] = $link(__('Dealers'), route('dealers.index'), request()->routeIs('dealers.*'));
+    }
+
+    if ($user->can('viewAny', App\Models\Order::class)) {
+        $sales[] = $link(__('Orders'), route('orders.index'), request()->routeIs('orders.*'));
+    }
+
+    if ($user->can('viewAny', App\Models\Delivery::class)) {
+        $sales[] = $link(__('Deliveries'), route('deliveries.index'), request()->routeIs('deliveries.*'));
+    }
+
+    if ($user->can('viewAny', App\Models\LedgerEntry::class)) {
+        $sales[] = $link(__('Ledger'), route('finance.index'), request()->routeIs('finance.*'));
+    }
+
+    $catalog = [];
+
+    if (! $user->can('shop') && $user->can('viewAny', App\Models\Product::class)) {
+        $catalog[] = $link(__('Products'), route('products.index'), request()->routeIs('products.*', 'brands.*', 'categories.*', 'units.*'));
+    }
+
+    if ($user->can('viewStock')) {
+        $catalog[] = $link(__('Stock'), route('stock.index'), request()->routeIs('stock.*', 'warehouses.*'));
+    }
+
+    if ($user->can('viewPrices')) {
+        $catalog[] = $link(__('Price lists'), route('price-lists.index'), request()->routeIs('price-lists.*'));
+    }
+
+    $communication = [];
+
+    if ($user->can('viewAny', App\Models\MessageThread::class)) {
+        $communication[] = $link(__('Messages'), route('messages.index'), request()->routeIs('messages.*'));
+    }
+
+    if ($user->can('viewAny', App\Models\MailLog::class)) {
+        $communication[] = $link(__('Mail log'), route('mail-logs.index'), request()->routeIs('mail-logs.*'));
+    }
+
+    if ($user->can('viewAny', App\Models\MailTemplate::class)) {
+        $communication[] = $link(__('Mail templates'), route('mail-templates.index'), request()->routeIs('mail-templates.*'));
+    }
+
+    $administration = [];
+
+    if ($user->can('viewAny', App\Models\User::class)) {
+        $administration[] = $link(__('Users'), route('users.index'), request()->routeIs('users.*'));
+    }
+
+    if ($user->can('viewReports')) {
+        $administration[] = $link(__('Reports'), route('reports.index'), request()->routeIs('reports.*'));
+    }
+
+    if ($user->can('viewAny', App\Models\AuditLog::class)) {
+        $administration[] = $link(__('Audit log'), route('audit-logs.index'), request()->routeIs('audit-logs.*'));
+    }
+
+    if ($user->can('update', App\Models\CompanySetting::class)) {
+        $administration[] = $link(__('Company details'), route('settings.edit'), request()->routeIs('settings.*'));
+    }
+
+    $entries = [
+        $link(__('Dashboard'), route('dashboard'), request()->routeIs('dashboard')),
+    ];
+
+    if ($user->can('shop')) {
+        $entries[] = $link(__('Catalog'), route('catalog.index'), request()->routeIs('catalog.*'));
+        $cartLabel = __('Cart');
+
+        if (($cartCount ?? 0) > 0) {
+            $cartLabel .= ' ('.$cartCount.')';
+        }
+
+        $entries[] = $link($cartLabel, route('cart.index'), request()->routeIs('cart.*'));
+    }
+
+    if ($user->dealer_id) {
+        $entries[] = $link(__('My company'), route('dealers.show', $user->dealer_id), request()->routeIs('dealers.show'));
+    }
+
+    foreach ([
+        __('Sales') => $sales,
+        __('Catalog') => $catalog,
+        __('Communication') => $communication,
+        __('Administration') => $administration,
+    ] as $label => $items) {
+        if (count($items) === 1) {
+            $entries[] = $items[0];
+        } elseif (count($items) > 1) {
+            $entries[] = [
+                'label' => $label,
+                'items' => $items,
+                'active' => collect($items)->contains(fn (array $item) => $item['active']),
+            ];
+        }
+    }
+@endphp
+
 <nav x-data="{ open: false }" class="sticky top-0 z-40 border-b border-white/10 bg-ink">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="flex h-16 items-center justify-between gap-4">
-            <div class="flex min-w-0 items-center gap-6">
-                <a href="{{ route('dashboard') }}" class="flex shrink-0 items-center gap-2">
-                    <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-brass text-xs font-bold text-white">OB</span>
-                    <span class="hidden font-semibold tracking-tight text-white sm:block">{{ config('app.name') }}</span>
-                </a>
+        <div class="flex h-16 items-center justify-between gap-3">
+            <a href="{{ route('dashboard') }}" class="flex shrink-0 items-center gap-2">
+                <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-brass text-xs font-bold text-white">OB</span>
+                <span class="hidden font-semibold tracking-tight text-white sm:block">{{ config('app.name') }}</span>
+            </a>
 
-                <div class="hidden items-center gap-1 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-                    @can('viewAny', App\Models\User::class)
-                        <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
-                            {{ __('Users') }}
-                        </x-nav-link>
-                    @endcan
-                    @can('viewAny', App\Models\Dealer::class)
-                        <x-nav-link :href="route('dealers.index')" :active="request()->routeIs('dealers.*') && ! Auth::user()->dealer_id">
-                            {{ __('Dealers') }}
-                        </x-nav-link>
-                    @endcan
-                    @if (Auth::user()->dealer_id)
-                        <x-nav-link :href="route('dealers.show', Auth::user()->dealer_id)" :active="request()->routeIs('dealers.show')">
-                            {{ __('My company') }}
+            <div class="hidden min-w-0 flex-1 items-center gap-1 lg:flex">
+                @foreach ($entries as $entry)
+                    @if (isset($entry['items']))
+                        <x-dropdown align="left" width="48">
+                            <x-slot name="trigger">
+                                <button type="button" @class([
+                                    'inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-sm focus:outline-none',
+                                    'bg-white/15 font-semibold text-white' => $entry['active'],
+                                    'font-medium text-stone-300 hover:bg-white/10 hover:text-white' => ! $entry['active'],
+                                ])>
+                                    {{ $entry['label'] }}
+                                    <svg class="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </x-slot>
+                            <x-slot name="content">
+                                @foreach ($entry['items'] as $item)
+                                    <x-dropdown-link :href="$item['href']" @class(['bg-paper font-semibold' => $item['active']])>
+                                        {{ $item['label'] }}
+                                    </x-dropdown-link>
+                                @endforeach
+                            </x-slot>
+                        </x-dropdown>
+                    @else
+                        <x-nav-link :href="$entry['href']" :active="$entry['active']">
+                            {{ $entry['label'] }}
                         </x-nav-link>
                     @endif
-                    @can('shop')
-                        <x-nav-link :href="route('catalog.index')" :active="request()->routeIs('catalog.*')">
-                            {{ __('Catalog') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.*')">
-                            {{ __('Cart') }}@if (($cartCount ?? 0) > 0) ({{ $cartCount }})@endif
-                        </x-nav-link>
-                    @elsecan('viewAny', App\Models\Product::class)
-                        <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*', 'brands.*', 'categories.*', 'units.*')">
-                            {{ __('Products') }}
-                        </x-nav-link>
-                    @endcan
-                    @can('viewStock')
-                        <x-nav-link :href="route('stock.index')" :active="request()->routeIs('stock.*', 'warehouses.*')">
-                            {{ __('Stock') }}
-                        </x-nav-link>
-                    @endcan
-                    @can('viewAny', App\Models\Order::class)
-                        <x-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
-                            {{ __('Orders') }}
-                        </x-nav-link>
-                    @endcan
-                    @can('viewAny', App\Models\Delivery::class)
-                        <x-nav-link :href="route('deliveries.index')" :active="request()->routeIs('deliveries.*')">
-                            {{ __('Deliveries') }}
-                        </x-nav-link>
-                    @endcan
-                    @can('viewAny', App\Models\LedgerEntry::class)
-                        <x-nav-link :href="route('finance.index')" :active="request()->routeIs('finance.*')">
-                            {{ __('Ledger') }}
-                        </x-nav-link>
-                    @endcan
-                    @can('viewReports')
-                        <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
-                            {{ __('Reports') }}
-                        </x-nav-link>
-                    @endcan
-                    @can('viewAny', App\Models\MessageThread::class)
-                        <x-nav-link :href="route('messages.index')" :active="request()->routeIs('messages.*')">
-                            {{ __('Messages') }}
-                        </x-nav-link>
-                    @endcan
-                    @can('viewAny', App\Models\MailLog::class)
-                        <x-nav-link :href="route('mail-logs.index')" :active="request()->routeIs('mail-logs.*')">
-                            {{ __('Mail log') }}
-                        </x-nav-link>
-                    @endcan
-                    @can('viewAny', App\Models\AuditLog::class)
-                        <x-nav-link :href="route('audit-logs.index')" :active="request()->routeIs('audit-logs.*')">
-                            {{ __('Audit log') }}
-                        </x-nav-link>
-                    @endcan
-                    @can('viewAny', App\Models\MailTemplate::class)
-                        <x-nav-link :href="route('mail-templates.index')" :active="request()->routeIs('mail-templates.*')">
-                            {{ __('Mail templates') }}
-                        </x-nav-link>
-                    @endcan
-                    @can('update', App\Models\CompanySetting::class)
-                        <x-nav-link :href="route('settings.edit')" :active="request()->routeIs('settings.*')">
-                            {{ __('Company details') }}
-                        </x-nav-link>
-                    @endcan
-                    @can('viewPrices')
-                        <x-nav-link :href="route('price-lists.index')" :active="request()->routeIs('price-lists.*')">
-                            {{ __('Price lists') }}
-                        </x-nav-link>
-                    @endcan
-                </div>
+                @endforeach
             </div>
 
-            <div class="hidden sm:flex sm:items-center">
+            <div class="hidden shrink-0 lg:flex lg:items-center">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium text-stone-200 hover:bg-white/10 focus:outline-none">
-                            <span class="max-w-[12rem] truncate">{{ Auth::user()->name }}</span>
+                        <button type="button" class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium text-stone-200 hover:bg-white/10 focus:outline-none">
+                            <span class="max-w-[10rem] truncate">{{ $user->name }}</span>
                             <svg class="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                             </svg>
                         </button>
                     </x-slot>
-
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
-
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <x-dropdown-link :href="route('logout')"
@@ -123,7 +171,7 @@
                 </x-dropdown>
             </div>
 
-            <div class="flex items-center sm:hidden">
+            <div class="flex items-center lg:hidden">
                 <button @click="open = ! open" class="inline-flex items-center justify-center rounded-lg p-2 text-stone-300 hover:bg-white/10 hover:text-white focus:outline-none">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -134,99 +182,28 @@
         </div>
     </div>
 
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden border-t border-white/10 px-3 py-3 sm:hidden">
+    <div :class="{'block': open, 'hidden': ! open}" class="hidden border-t border-white/10 px-3 py-3 lg:hidden">
         <div class="space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
-            @can('viewAny', App\Models\User::class)
-                <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
-                    {{ __('Users') }}
-                </x-responsive-nav-link>
-            @endcan
-            @can('viewAny', App\Models\Dealer::class)
-                <x-responsive-nav-link :href="route('dealers.index')" :active="request()->routeIs('dealers.*') && ! Auth::user()->dealer_id">
-                    {{ __('Dealers') }}
-                </x-responsive-nav-link>
-            @endcan
-            @if (Auth::user()->dealer_id)
-                <x-responsive-nav-link :href="route('dealers.show', Auth::user()->dealer_id)" :active="request()->routeIs('dealers.show')">
-                    {{ __('My company') }}
-                </x-responsive-nav-link>
-            @endif
-            @can('shop')
-                <x-responsive-nav-link :href="route('catalog.index')" :active="request()->routeIs('catalog.*')">
-                    {{ __('Catalog') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.*')">
-                    {{ __('Cart') }}@if (($cartCount ?? 0) > 0) ({{ $cartCount }})@endif
-                </x-responsive-nav-link>
-            @elsecan('viewAny', App\Models\Product::class)
-                <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*', 'brands.*', 'categories.*', 'units.*')">
-                    {{ __('Products') }}
-                </x-responsive-nav-link>
-            @endcan
-            @can('viewAny', App\Models\Order::class)
-                <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.*')">
-                    {{ __('Orders') }}
-                </x-responsive-nav-link>
-            @endcan
-            @can('viewAny', App\Models\Delivery::class)
-                <x-responsive-nav-link :href="route('deliveries.index')" :active="request()->routeIs('deliveries.*')">
-                    {{ __('Deliveries') }}
-                </x-responsive-nav-link>
-            @endcan
-            @can('viewAny', App\Models\LedgerEntry::class)
-                <x-responsive-nav-link :href="route('finance.index')" :active="request()->routeIs('finance.*')">
-                    {{ __('Ledger') }}
-                </x-responsive-nav-link>
-            @endcan
-            @can('viewReports')
-                <x-responsive-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
-                    {{ __('Reports') }}
-                </x-responsive-nav-link>
-            @endcan
-            @can('viewAny', App\Models\MessageThread::class)
-                <x-responsive-nav-link :href="route('messages.index')" :active="request()->routeIs('messages.*')">
-                    {{ __('Messages') }}
-                </x-responsive-nav-link>
-            @endcan
-            @can('viewAny', App\Models\MailLog::class)
-                <x-responsive-nav-link :href="route('mail-logs.index')" :active="request()->routeIs('mail-logs.*')">
-                    {{ __('Mail log') }}
-                </x-responsive-nav-link>
-            @endcan
-            @can('viewAny', App\Models\AuditLog::class)
-                <x-responsive-nav-link :href="route('audit-logs.index')" :active="request()->routeIs('audit-logs.*')">
-                    {{ __('Audit log') }}
-                </x-responsive-nav-link>
-            @endcan
-            @can('viewAny', App\Models\MailTemplate::class)
-                <x-responsive-nav-link :href="route('mail-templates.index')" :active="request()->routeIs('mail-templates.*')">
-                    {{ __('Mail templates') }}
-                </x-responsive-nav-link>
-            @endcan
-            @can('viewStock')
-                <x-responsive-nav-link :href="route('stock.index')" :active="request()->routeIs('stock.*', 'warehouses.*')">
-                    {{ __('Stock') }}
-                </x-responsive-nav-link>
-            @endcan
-            @can('update', App\Models\CompanySetting::class)
-                <x-responsive-nav-link :href="route('settings.edit')" :active="request()->routeIs('settings.*')">
-                    {{ __('Company details') }}
-                </x-responsive-nav-link>
-            @endcan
-            @can('viewPrices')
-                <x-responsive-nav-link :href="route('price-lists.index')" :active="request()->routeIs('price-lists.*')">
-                    {{ __('Price lists') }}
-                </x-responsive-nav-link>
-            @endcan
+            @foreach ($entries as $entry)
+                @if (isset($entry['items']))
+                    <p class="px-3 pb-1 pt-3 text-xs font-semibold uppercase tracking-wide text-stone-400">{{ $entry['label'] }}</p>
+                    @foreach ($entry['items'] as $item)
+                        <x-responsive-nav-link :href="$item['href']" :active="$item['active']">
+                            {{ $item['label'] }}
+                        </x-responsive-nav-link>
+                    @endforeach
+                @else
+                    <x-responsive-nav-link :href="$entry['href']" :active="$entry['active']">
+                        {{ $entry['label'] }}
+                    </x-responsive-nav-link>
+                @endif
+            @endforeach
         </div>
 
         <div class="mt-3 space-y-1 border-t border-white/10 pt-3">
             <div class="px-3 pb-2">
-                <div class="text-sm font-semibold text-white">{{ Auth::user()->name }}</div>
-                <div class="text-xs text-stone-400">{{ Auth::user()->email }}</div>
+                <div class="text-sm font-semibold text-white">{{ $user->name }}</div>
+                <div class="text-xs text-stone-400">{{ $user->email }}</div>
             </div>
             <x-responsive-nav-link :href="route('profile.edit')">
                 {{ __('Profile') }}
