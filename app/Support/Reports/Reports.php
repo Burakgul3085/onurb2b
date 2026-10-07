@@ -433,7 +433,49 @@ class Reports
             });
     }
 
+    /**
+     * @return list<array{label: string, amount: string}>
+     */
+    public function topProducts(ReportQuery $query, int $limit = 5): array
+    {
+        $rows = [];
+
+        foreach (array_slice($this->salesBuckets($query, 'product'), 0, $limit) as $bucket) {
+            $rows[] = [
+                'label' => $bucket['sku'].' — '.$bucket['product'],
+                'amount' => $bucket['amount'],
+            ];
+        }
+
+        return $rows;
+    }
+
     private function groupedSales(ReportQuery $query, string $group): ReportResult
+    {
+        $rows = [];
+        $pieces = 0;
+        $amount = '0.00';
+
+        foreach ($this->salesBuckets($query, $group) as $bucket) {
+            $name = $bucket['name'];
+            $pieces += $bucket['pieces'];
+            $amount = Money::add($amount, $bucket['amount']);
+            $rows[] = $group === 'product'
+                ? ['sku' => $bucket['sku'], 'product' => $bucket['product'], 'pieces' => (string) $bucket['pieces'], 'amount' => Money::format($bucket['amount'])]
+                : ['name' => $name, 'pieces' => (string) $bucket['pieces'], 'amount' => Money::format($bucket['amount'])];
+        }
+
+        $columns = $group === 'product'
+            ? [['sku', 'SKU'], ['product', 'Ürün'], ['pieces', 'Adet'], ['amount', 'Tutar']]
+            : [['name', $group === 'brand' ? 'Marka' : 'Kategori'], ['pieces', 'Adet'], ['amount', 'Tutar']];
+
+        return $this->table($columns, $rows, ['pieces' => (string) $pieces, 'amount' => Money::format($amount)], ['amount']);
+    }
+
+    /**
+     * @return list<array{name: string, sku: string, product: string, pieces: int, amount: string}>
+     */
+    private function salesBuckets(ReportQuery $query, string $group): array
     {
         $buckets = [];
 
@@ -456,6 +498,7 @@ class Reports
                     'brand' => (string) ($line['brand'] !== '' ? $line['brand'] : 'Markasız'),
                     default => $line['sku'].' '.$line['product'],
                 };
+                $buckets[$key]['name'] = $key;
                 $buckets[$key]['pieces'] = ($buckets[$key]['pieces'] ?? 0) + $line['pieces'];
                 $buckets[$key]['amount'] = Money::add($buckets[$key]['amount'] ?? '0.00', $line['amount']);
                 $buckets[$key]['sku'] = $line['sku'];
@@ -465,23 +508,7 @@ class Reports
 
         uasort($buckets, fn (array $left, array $right) => bccomp($right['amount'], $left['amount'], 2));
 
-        $rows = [];
-        $pieces = 0;
-        $amount = '0.00';
-
-        foreach ($buckets as $name => $bucket) {
-            $pieces += $bucket['pieces'];
-            $amount = Money::add($amount, $bucket['amount']);
-            $rows[] = $group === 'product'
-                ? ['sku' => $bucket['sku'], 'product' => $bucket['product'], 'pieces' => (string) $bucket['pieces'], 'amount' => Money::format($bucket['amount'])]
-                : ['name' => $name, 'pieces' => (string) $bucket['pieces'], 'amount' => Money::format($bucket['amount'])];
-        }
-
-        $columns = $group === 'product'
-            ? [['sku', 'SKU'], ['product', 'Ürün'], ['pieces', 'Adet'], ['amount', 'Tutar']]
-            : [['name', $group === 'brand' ? 'Marka' : 'Kategori'], ['pieces', 'Adet'], ['amount', 'Tutar']];
-
-        return $this->table($columns, $rows, ['pieces' => (string) $pieces, 'amount' => Money::format($amount)], ['amount']);
+        return array_values($buckets);
     }
 
     /**
