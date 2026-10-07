@@ -20,6 +20,16 @@
                             {{ __('Users') }}
                         </x-nav-link>
                     @endcan
+                    @can('viewAny', App\Models\Dealer::class)
+                        <x-nav-link :href="route('dealers.index')" :active="request()->routeIs('dealers.*')">
+                            {{ __('Dealers') }}
+                        </x-nav-link>
+                    @endcan
+                    @if (Auth::user()->dealer_id)
+                        <x-nav-link :href="route('dealers.show', Auth::user()->dealer_id)" :active="request()->routeIs('dealers.show')">
+                            {{ __('My company') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -80,6 +90,16 @@
                     {{ __('Users') }}
                 </x-responsive-nav-link>
             @endcan
+            @can('viewAny', App\Models\Dealer::class)
+                <x-responsive-nav-link :href="route('dealers.index')" :active="request()->routeIs('dealers.*')">
+                    {{ __('Dealers') }}
+                </x-responsive-nav-link>
+            @endcan
+            @if (Auth::user()->dealer_id)
+                <x-responsive-nav-link :href="route('dealers.show', Auth::user()->dealer_id)" :active="request()->routeIs('dealers.show')">
+                    {{ __('My company') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->

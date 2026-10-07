@@ -6,6 +6,7 @@ namespace App\Models;
 use App\Enums\Role;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -25,6 +26,7 @@ class User extends Authenticatable
         'email',
         'password',
         'is_active',
+        'dealer_id',
     ];
 
     /**
@@ -49,6 +51,14 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_active' => 'boolean',
         ];
+    }
+
+    /**
+     * @return BelongsTo<Dealer, $this>
+     */
+    public function dealer(): BelongsTo
+    {
+        return $this->belongsTo(Dealer::class);
     }
 
     public function roleLabels(): string

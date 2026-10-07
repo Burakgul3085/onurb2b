@@ -44,4 +44,8 @@
             </x-primary-button>
         </div>
     </form>
+
+    <p class="mt-4 text-center text-sm text-gray-600">
+        <a class="underline hover:text-gray-900" href="{{ route('dealers.apply') }}">{{ __('Apply as a dealer') }}</a>
+    </p>
 </x-guest-layout>
