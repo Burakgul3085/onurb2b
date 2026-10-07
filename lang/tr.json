@@ -365,5 +365,16 @@
     "Choose your own company.": "Kendi firmanızı seçin.",
     "This order belongs to another company.": "Bu sipariş başka bir firmaya ait.",
     "Open a thread": "Yazışma aç",
-    "Error": "Hata"
+    "Error": "Hata",
+    "Reports": "Raporlar",
+    "Report": "Rapor",
+    "Show report": "Raporu göster",
+    "Start date": "Başlangıç",
+    "End date": "Bitiş",
+    "Report queued.": "Rapor kuyruğa alındı.",
+    "This report is large. Generate it from the queue.": "Bu rapor büyük. Excel veya PDF kuyruktan üretilir.",
+    "No report rows.": "Bu filtrede kayıt yok.",
+    "Queued reports": "Kuyruktaki raporlar",
+    "Download report": "İndir",
+    "Sales, stock, ledger, and deliveries": "Satış, stok, cari ve teslimat"
 }

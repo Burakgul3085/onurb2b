@@ -62,6 +62,12 @@
                     <p class="mt-2 text-lg font-semibold text-ink">{{ __('Threads with dealers') }}</p>
                 </a>
             @endcan
+            @can('viewReports')
+                <a href="{{ route('reports.index') }}" class="card block p-6 transition hover:-translate-y-0.5 hover:shadow-md">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-ink-muted">{{ __('Reports') }}</p>
+                    <p class="mt-2 text-lg font-semibold text-ink">{{ __('Sales, stock, ledger, and deliveries') }}</p>
+                </a>
+            @endcan
             @can('viewAny', App\Models\LedgerEntry::class)
                 <a href="{{ route('finance.index') }}" class="card block p-6 transition hover:-translate-y-0.5 hover:shadow-md">
                     <p class="text-xs font-semibold uppercase tracking-wide text-ink-muted">{{ __('Ledger') }}</p>

@@ -8,6 +8,7 @@ use App\Models\CartItem;
 use App\Models\User;
 use App\Policies\CatalogPolicy;
 use App\Policies\PriceListPolicy;
+use App\Policies\ReportPolicy;
 use App\Policies\StockPolicy;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
@@ -35,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('viewStock', [StockPolicy::class, 'viewAny']);
         Gate::define('adjustStock', [StockPolicy::class, 'adjust']);
         Gate::define('viewPrices', [PriceListPolicy::class, 'viewAny']);
+        Gate::define('viewReports', [ReportPolicy::class, 'viewAny']);
         Gate::define('managePrices', [PriceListPolicy::class, 'create']);
         Gate::define('shop', function (User $user) {
             if ($user->dealer_id === null || ! $user->can(Permission::ProductsView->value)) {

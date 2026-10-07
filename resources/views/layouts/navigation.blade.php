@@ -58,6 +58,11 @@
                             {{ __('Ledger') }}
                         </x-nav-link>
                     @endcan
+                    @can('viewReports')
+                        <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
+                            {{ __('Reports') }}
+                        </x-nav-link>
+                    @endcan
                     @can('viewAny', App\Models\MessageThread::class)
                         <x-nav-link :href="route('messages.index')" :active="request()->routeIs('messages.*')">
                             {{ __('Messages') }}
@@ -169,6 +174,11 @@
             @can('viewAny', App\Models\LedgerEntry::class)
                 <x-responsive-nav-link :href="route('finance.index')" :active="request()->routeIs('finance.*')">
                     {{ __('Ledger') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('viewReports')
+                <x-responsive-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
+                    {{ __('Reports') }}
                 </x-responsive-nav-link>
             @endcan
             @can('viewAny', App\Models\MessageThread::class)

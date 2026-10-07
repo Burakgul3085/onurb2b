@@ -18,6 +18,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PriceListController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
@@ -80,6 +81,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/settings', [CompanySettingController::class, 'edit'])->name('settings.edit');
     Route::patch('/settings', [CompanySettingController::class, 'update'])->name('settings.update');
     Route::get('/documents/{document}', [DocumentController::class, 'show'])->name('documents.show');
+
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/exports/{export}', [ReportController::class, 'download'])->name('reports.exports.show');
 
     Route::get('/finance', [FinanceController::class, 'index'])->name('finance.index');
     Route::post('/finance/entries/{entry}/reverse', [FinanceController::class, 'reverse'])->name('finance.entries.reverse');
