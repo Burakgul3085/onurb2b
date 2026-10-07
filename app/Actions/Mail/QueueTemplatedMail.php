@@ -14,12 +14,12 @@ class QueueTemplatedMail
     /**
      * @param  array<string, string|int|float|null>  $replacements
      */
-    public function execute(MailTemplateKey $key, string $recipient, array $replacements): void
+    public function execute(MailTemplateKey $key, string $recipient, array $replacements): bool
     {
         $recipient = trim($recipient);
 
         if (filter_var($recipient, FILTER_VALIDATE_EMAIL) === false) {
-            return;
+            return false;
         }
 
         $template = MailTemplate::query()
@@ -28,7 +28,7 @@ class QueueTemplatedMail
             ->first();
 
         if ($template === null) {
-            return;
+            return false;
         }
 
         $log = MailLog::query()->create([
@@ -40,6 +40,8 @@ class QueueTemplatedMail
         ]);
 
         SendTemplatedMail::dispatch($log->id);
+
+        return true;
     }
 
     /**

@@ -5,6 +5,7 @@ namespace App\Actions\Mail;
 use App\Enums\MailTemplateKey;
 use App\Enums\Permission;
 use App\Models\Dealer;
+use App\Models\LedgerEntry;
 use App\Models\Message;
 use App\Models\Order;
 use App\Models\User;
@@ -123,6 +124,38 @@ class Notify
                 'company' => $thread->dealer->company_name,
             ]);
         }
+    }
+
+    public function dueDateApproaching(LedgerEntry $entry): bool
+    {
+        $entry->loadMissing('dealer');
+
+        if ($entry->dealer === null) {
+            return false;
+        }
+
+        return $this->mail->execute(MailTemplateKey::DueDateApproaching, $entry->dealer->email, [
+            ...$this->dealerFields($entry->dealer),
+            'due_on' => $entry->due_on?->timezone(config('app.timezone'))->format('d.m.Y') ?? '',
+        ]);
+    }
+
+    public function criticalStock(User $user, string $lines): bool
+    {
+        return $this->mail->execute(MailTemplateKey::CriticalStock, $user->email, [
+            'contact' => $user->name,
+            'lines' => $lines,
+        ]);
+    }
+
+    public function dailyReport(User $user, string $date, string $sales, int $orders): bool
+    {
+        return $this->mail->execute(MailTemplateKey::DailyReport, $user->email, [
+            'contact' => $user->name,
+            'date' => $date,
+            'sales' => $sales,
+            'orders' => (string) $orders,
+        ]);
     }
 
     private function orderMail(MailTemplateKey $key, int $orderId): void

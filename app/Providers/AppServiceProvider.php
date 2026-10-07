@@ -10,6 +10,8 @@ use App\Policies\CatalogPolicy;
 use App\Policies\PriceListPolicy;
 use App\Policies\ReportPolicy;
 use App\Policies\StockPolicy;
+use App\Support\Ops\DatabaseDumper;
+use App\Support\Ops\MysqldumpDumper;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
@@ -24,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(DatabaseDumper::class, MysqldumpDumper::class);
     }
 
     /**

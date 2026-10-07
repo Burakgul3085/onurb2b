@@ -25,6 +25,7 @@ class LedgerEntry extends Model
         'credit',
         'document_date',
         'due_on',
+        'due_notified_at',
         'note',
         'reverses_entry_id',
     ];
@@ -41,6 +42,7 @@ class LedgerEntry extends Model
             'credit' => 'decimal:2',
             'document_date' => 'date',
             'due_on' => 'date',
+            'due_notified_at' => 'datetime',
         ];
     }
 

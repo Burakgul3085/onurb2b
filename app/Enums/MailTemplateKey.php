@@ -15,6 +15,8 @@ enum MailTemplateKey: string
     case OrderDelivered = 'order_delivered';
     case CollectionRecorded = 'collection_recorded';
     case DueDateApproaching = 'due_date_approaching';
+    case CriticalStock = 'critical_stock';
+    case DailyReport = 'daily_report';
     case NewMessage = 'new_message';
 
     public function label(): string
@@ -31,6 +33,8 @@ enum MailTemplateKey: string
             self::OrderDelivered => 'Teslim edildi',
             self::CollectionRecorded => 'Tahsilat işlendi',
             self::DueDateApproaching => 'Vade yaklaşması',
+            self::CriticalStock => 'Kritik stok',
+            self::DailyReport => 'Günlük rapor',
             self::NewMessage => 'Yeni mesaj',
         };
     }
