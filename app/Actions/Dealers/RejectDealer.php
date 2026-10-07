@@ -2,6 +2,7 @@
 
 namespace App\Actions\Dealers;
 
+use App\Actions\Mail\Notify;
 use App\Enums\DealerApplicationStatus;
 use App\Models\Dealer;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +26,8 @@ class RejectDealer
             ]);
 
             $dealer->users()->update(['is_active' => false]);
+
+            DB::afterCommit(fn () => app(Notify::class)->dealerRejected($dealer->id));
 
             return $dealer;
         });

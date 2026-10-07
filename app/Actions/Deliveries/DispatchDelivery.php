@@ -2,6 +2,7 @@
 
 namespace App\Actions\Deliveries;
 
+use App\Actions\Mail\Notify;
 use App\Actions\Stock\RecordStockMovement;
 use App\Enums\DeliveryStatus;
 use App\Enums\OrderStatus;
@@ -71,6 +72,8 @@ class DispatchDelivery
                     'departed_at' => now(),
                 ]);
                 $order->update(['status' => OrderStatus::OutForDelivery]);
+
+                DB::afterCommit(fn () => app(Notify::class)->orderOutForDelivery($order->id));
 
                 return $delivery->refresh()->load('lines');
             });

@@ -123,4 +123,12 @@ class Order extends Model
     {
         return $this->hasMany(LedgerEntry::class);
     }
+
+    /**
+     * @return HasMany<MessageThread, $this>
+     */
+    public function messageThreads(): HasMany
+    {
+        return $this->hasMany(MessageThread::class);
+    }
 }

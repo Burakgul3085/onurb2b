@@ -11,6 +11,9 @@ use App\Http\Controllers\DealerPriceController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\FinanceController;
+use App\Http\Controllers\MailLogController;
+use App\Http\Controllers\MailTemplateController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PriceListController;
 use App\Http\Controllers\ProductController;
@@ -62,6 +65,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/deliveries/{delivery}/complete', [DeliveryController::class, 'complete'])->name('deliveries.complete');
     Route::post('/deliveries/{delivery}/fail', [DeliveryController::class, 'fail'])->name('deliveries.fail');
     Route::delete('/deliveries/{delivery}', [DeliveryController::class, 'destroy'])->name('deliveries.destroy');
+
+    Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::get('/messages/create', [MessageController::class, 'create'])->name('messages.create');
+    Route::post('/messages', [MessageController::class, 'store'])->middleware('throttle:20,1')->name('messages.store');
+    Route::get('/messages/{thread}', [MessageController::class, 'show'])->name('messages.show');
+    Route::post('/messages/{thread}', [MessageController::class, 'reply'])->middleware('throttle:20,1')->name('messages.reply');
+
+    Route::get('/mail-templates', [MailTemplateController::class, 'index'])->name('mail-templates.index');
+    Route::get('/mail-templates/{template}/edit', [MailTemplateController::class, 'edit'])->name('mail-templates.edit');
+    Route::patch('/mail-templates/{template}', [MailTemplateController::class, 'update'])->name('mail-templates.update');
+    Route::get('/mail-logs', [MailLogController::class, 'index'])->name('mail-logs.index');
 
     Route::get('/settings', [CompanySettingController::class, 'edit'])->name('settings.edit');
     Route::patch('/settings', [CompanySettingController::class, 'update'])->name('settings.update');

@@ -51,6 +51,22 @@
             @endforelse
         </div>
 
+        @if ($canMessage || $messageThreads->isNotEmpty())
+            <div class="card space-y-3 p-6 text-sm">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <h3 class="font-semibold text-ink">{{ __('Messages') }}</h3>
+                    @if ($canMessage)
+                        <a class="link" href="{{ route('messages.create', ['order' => $order->id]) }}">{{ __('Write a message') }}</a>
+                    @endif
+                </div>
+                @forelse ($messageThreads as $thread)
+                    <a class="link" href="{{ route('messages.show', $thread) }}">{{ $thread->subject }}</a>
+                @empty
+                    <p class="text-ink-muted">{{ __('No messages yet.') }}</p>
+                @endforelse
+            </div>
+        @endif
+
         <div class="card overflow-x-auto p-6">
             <table class="data-table">
                 <thead>

@@ -89,6 +89,14 @@ class Dealer extends Model
     }
 
     /**
+     * @return HasMany<MessageThread, $this>
+     */
+    public function messageThreads(): HasMany
+    {
+        return $this->hasMany(MessageThread::class);
+    }
+
+    /**
      * @return BelongsTo<User, $this>
      */
     public function approvedBy(): BelongsTo

@@ -2,6 +2,7 @@
 
 namespace App\Actions\Dealers;
 
+use App\Actions\Mail\Notify;
 use App\Actions\Users\CreateUser;
 use App\Enums\DealerApplicationStatus;
 use App\Enums\Role;
@@ -51,6 +52,11 @@ class ApproveDealer
                 'approved_by' => $actor->id,
                 'rejection_reason' => null,
             ]);
+
+            DB::afterCommit(function () use ($dealer, $user) {
+                app(Notify::class)->dealerApproved($dealer->id);
+                app(Notify::class)->accountActivated($user->id);
+            });
 
             return $user;
         });

@@ -58,6 +58,21 @@
                             {{ __('Ledger') }}
                         </x-nav-link>
                     @endcan
+                    @can('viewAny', App\Models\MessageThread::class)
+                        <x-nav-link :href="route('messages.index')" :active="request()->routeIs('messages.*')">
+                            {{ __('Messages') }}
+                        </x-nav-link>
+                    @endcan
+                    @can('viewAny', App\Models\MailLog::class)
+                        <x-nav-link :href="route('mail-logs.index')" :active="request()->routeIs('mail-logs.*')">
+                            {{ __('Mail log') }}
+                        </x-nav-link>
+                    @endcan
+                    @can('viewAny', App\Models\MailTemplate::class)
+                        <x-nav-link :href="route('mail-templates.index')" :active="request()->routeIs('mail-templates.*')">
+                            {{ __('Mail templates') }}
+                        </x-nav-link>
+                    @endcan
                     @can('update', App\Models\CompanySetting::class)
                         <x-nav-link :href="route('settings.edit')" :active="request()->routeIs('settings.*')">
                             {{ __('Company details') }}
@@ -154,6 +169,21 @@
             @can('viewAny', App\Models\LedgerEntry::class)
                 <x-responsive-nav-link :href="route('finance.index')" :active="request()->routeIs('finance.*')">
                     {{ __('Ledger') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('viewAny', App\Models\MessageThread::class)
+                <x-responsive-nav-link :href="route('messages.index')" :active="request()->routeIs('messages.*')">
+                    {{ __('Messages') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('viewAny', App\Models\MailLog::class)
+                <x-responsive-nav-link :href="route('mail-logs.index')" :active="request()->routeIs('mail-logs.*')">
+                    {{ __('Mail log') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('viewAny', App\Models\MailTemplate::class)
+                <x-responsive-nav-link :href="route('mail-templates.index')" :active="request()->routeIs('mail-templates.*')">
+                    {{ __('Mail templates') }}
                 </x-responsive-nav-link>
             @endcan
             @can('viewStock')

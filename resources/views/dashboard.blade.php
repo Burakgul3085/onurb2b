@@ -56,6 +56,12 @@
                     <p class="mt-2 text-lg font-semibold text-ink">{{ __('Eskişehir delivery route') }}</p>
                 </a>
             @endcan
+            @can('viewAny', App\Models\MessageThread::class)
+                <a href="{{ route('messages.index') }}" class="card block p-6 transition hover:-translate-y-0.5 hover:shadow-md">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-ink-muted">{{ __('Messages') }}</p>
+                    <p class="mt-2 text-lg font-semibold text-ink">{{ __('Threads with dealers') }}</p>
+                </a>
+            @endcan
             @can('viewAny', App\Models\LedgerEntry::class)
                 <a href="{{ route('finance.index') }}" class="card block p-6 transition hover:-translate-y-0.5 hover:shadow-md">
                     <p class="text-xs font-semibold uppercase tracking-wide text-ink-muted">{{ __('Ledger') }}</p>

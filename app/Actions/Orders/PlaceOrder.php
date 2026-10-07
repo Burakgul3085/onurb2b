@@ -2,6 +2,7 @@
 
 namespace App\Actions\Orders;
 
+use App\Actions\Mail\Notify;
 use App\Enums\District;
 use App\Enums\OrderStatus;
 use App\Exceptions\OrderException;
@@ -87,6 +88,8 @@ class PlaceOrder
             }
 
             $cart?->items()->delete();
+
+            DB::afterCommit(fn () => app(Notify::class)->orderPlaced($order->id));
 
             return $order->load('lines');
         });

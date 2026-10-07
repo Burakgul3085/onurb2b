@@ -2,6 +2,7 @@
 
 namespace App\Actions\Orders;
 
+use App\Actions\Mail\Notify;
 use App\Enums\OrderStatus;
 use App\Exceptions\OrderException;
 use App\Models\Order;
@@ -19,6 +20,8 @@ class MarkOrderPreparing
             }
 
             $order->update(['status' => OrderStatus::Preparing]);
+
+            DB::afterCommit(fn () => app(Notify::class)->orderPreparing($order->id));
 
             return $order->refresh();
         });

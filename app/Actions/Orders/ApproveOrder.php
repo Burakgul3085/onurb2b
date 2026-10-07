@@ -2,6 +2,7 @@
 
 namespace App\Actions\Orders;
 
+use App\Actions\Mail\Notify;
 use App\Actions\Stock\RecordStockMovement;
 use App\Enums\OrderStatus;
 use App\Exceptions\OrderException;
@@ -69,6 +70,8 @@ class ApproveOrder
                     'approved_at' => now(),
                     'approved_by' => $actor->id,
                 ]);
+
+                DB::afterCommit(fn () => app(Notify::class)->orderApproved($order->id));
 
                 return $order->refresh()->load('lines');
             });

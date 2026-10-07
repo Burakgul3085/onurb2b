@@ -4,6 +4,7 @@ namespace App\Actions\Deliveries;
 
 use App\Actions\Documents\IssueDeliveryDocument;
 use App\Actions\Finance\PostDeliverySale;
+use App\Actions\Mail\Notify;
 use App\Actions\Stock\RecordStockMovement;
 use App\Enums\DeliveryStatus;
 use App\Exceptions\DeliveryException;
@@ -82,6 +83,12 @@ class CompleteDelivery
                 $this->sales->execute($delivery, $deliveredByLine, $actor);
                 $delivery->refresh();
                 $this->documents->execute($delivery);
+
+                $orderId = $delivery->order_id;
+
+                if (array_sum($deliveredByLine) > 0) {
+                    DB::afterCommit(fn () => app(Notify::class)->orderDelivered($orderId));
+                }
 
                 return $delivery;
             });

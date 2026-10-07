@@ -12,6 +12,7 @@ use App\Http\Requests\Orders\ApproveOrderRequest;
 use App\Http\Requests\Orders\CancelOrderRequest;
 use App\Http\Requests\Orders\PlaceOrderRequest;
 use App\Models\Delivery;
+use App\Models\MessageThread;
 use App\Models\Order;
 use App\Models\StockLevel;
 use App\Models\Warehouse;
@@ -72,6 +73,10 @@ class OrderController extends Controller
             'canApprove' => $request->user()->can('approve', $order),
             'canCancel' => $request->user()->can('cancel', $order),
             'canReturn' => app(LedgerEntryPolicy::class)->returnGoods($request->user(), $order),
+            'messageThreads' => $request->user()->can('viewAny', MessageThread::class)
+                ? $order->messageThreads()->latest('id')->get()
+                : collect(),
+            'canMessage' => $request->user()->can('create', MessageThread::class),
             'canScheduleDelivery' => $request->user()->can('create', Delivery::class) && in_array($order->status, [
                 OrderStatus::Approved,
                 OrderStatus::Preparing,
