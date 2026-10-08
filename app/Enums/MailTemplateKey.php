@@ -21,6 +21,7 @@ enum MailTemplateKey: string
     case OrderPlacedOffice = 'order_placed_office';
     case DueDateOffice = 'due_date_office';
     case NewMessage = 'new_message';
+    case PasswordReset = 'password_reset';
 
     public function label(): string
     {
@@ -42,6 +43,7 @@ enum MailTemplateKey: string
             self::OrderPlacedOffice => 'Sipariş firma kopyası',
             self::DueDateOffice => 'Vade firma kopyası',
             self::NewMessage => 'Yeni mesaj',
+            self::PasswordReset => 'Parola sıfırlama',
         };
     }
 }

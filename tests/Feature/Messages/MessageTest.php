@@ -23,7 +23,7 @@ use Database\Seeders\UnitSeeder;
 use Illuminate\Support\Facades\Mail;
 
 test('mail templates are stored and an inactive template is skipped', function () {
-    expect(MailTemplate::query()->count())->toBe(17);
+    expect(MailTemplate::query()->count())->toBe(18);
     expect(MailTemplate::query()->where('key', MailTemplateKey::DueDateApproaching)->first()->is_active)->toBeTrue();
 
     MailTemplate::query()->where('key', MailTemplateKey::OrderPlaced)->update(['is_active' => false]);
