@@ -31,5 +31,12 @@
             </div>
             <x-primary-button>{{ __('Save') }}</x-primary-button>
         </form>
+
+        <div class="mt-6">
+            <p class="mb-2 text-sm font-semibold text-ink">{{ __('Preview') }}</p>
+            <div class="overflow-hidden rounded-2xl border border-stone-200">
+                {!! app(\App\Support\Mail\CorporateMessage::class)->card($template->subject, $template->body, $template->name) !!}
+            </div>
+        </div>
     </div>
 </x-app-layout>

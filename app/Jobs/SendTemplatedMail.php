@@ -4,9 +4,9 @@ namespace App\Jobs;
 
 use App\Enums\MailStatus;
 use App\Models\MailLog;
+use App\Support\Mail\CorporateMessage;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -27,14 +27,13 @@ class SendTemplatedMail implements ShouldQueue
         }
 
         try {
-            Mail::raw($log->body, function ($message) use ($log) {
-                $message->to($log->recipient)->subject($log->subject);
-                $replyTo = config('mail.from.address');
-
-                if (is_string($replyTo) && $replyTo !== '') {
-                    $message->replyTo($replyTo);
-                }
-            });
+            $log->loadMissing('template');
+            app(CorporateMessage::class)->send(
+                $log->recipient,
+                $log->subject,
+                $log->body,
+                $log->template?->name ?? 'Bildirim',
+            );
 
             $log->update([
                 'status' => MailStatus::Sent,

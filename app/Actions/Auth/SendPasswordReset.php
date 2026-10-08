@@ -7,7 +7,7 @@ use App\Enums\MailTemplateKey;
 use App\Models\MailLog;
 use App\Models\MailTemplate;
 use App\Models\User;
-use Illuminate\Support\Facades\Mail;
+use App\Support\Mail\CorporateMessage;
 use Illuminate\Support\Str;
 use Throwable;
 
@@ -47,14 +47,7 @@ class SendPasswordReset
         ]);
 
         try {
-            Mail::raw($body, function ($message) use ($user, $subject) {
-                $message->to($user->email)->subject($subject);
-                $replyTo = config('mail.from.address');
-
-                if (is_string($replyTo) && $replyTo !== '') {
-                    $message->replyTo($replyTo);
-                }
-            });
+            app(CorporateMessage::class)->send($user->email, $subject, $body, $template->name);
 
             $log->update([
                 'status' => MailStatus::Sent,

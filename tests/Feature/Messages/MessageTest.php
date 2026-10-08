@@ -20,7 +20,27 @@ use App\Models\StockLevel;
 use App\Models\Unit;
 use App\Models\Warehouse;
 use Database\Seeders\UnitSeeder;
+use Illuminate\Mail\Events\MessageSent;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
+
+test('outbound mail uses the corporate frame and escapes the text', function () {
+    $html = '';
+
+    Event::listen(MessageSent::class, function (MessageSent $event) use (&$html) {
+        $html = (string) $event->message->getHtmlBody();
+    });
+
+    app(QueueTemplatedMail::class)->execute(MailTemplateKey::DealerApplication, 'bayi@example.test', [
+        'contact' => '<b>Ali</b>',
+        'company' => 'Tepebaşı',
+    ]);
+
+    expect($html)->toContain('Onur B2B')
+        ->and($html)->toContain('Onur Kırtasiye')
+        ->and($html)->toContain('&lt;b&gt;Ali&lt;/b&gt;')
+        ->and($html)->not->toContain('<b>Ali</b>');
+});
 
 test('mail templates are stored and an inactive template is skipped', function () {
     expect(MailTemplate::query()->count())->toBe(18);
@@ -38,7 +58,7 @@ test('mail templates are stored and an inactive template is skipped', function (
 });
 
 test('a failed send is kept on the mail log', function () {
-    Mail::shouldReceive('raw')->once()->andThrow(new RuntimeException('smtp kapalı'));
+    Mail::shouldReceive('html')->once()->andThrow(new RuntimeException('smtp kapalı'));
 
     app(QueueTemplatedMail::class)->execute(MailTemplateKey::DealerApplication, 'bayi@example.test', [
         'contact' => 'Ali',
