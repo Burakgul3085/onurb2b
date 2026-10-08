@@ -93,4 +93,74 @@
     .stat {
         @apply rounded-xl bg-paper px-4 py-3;
     }
+
+    .dash-link {
+        @apply flex items-center gap-2.5 rounded-xl border border-stone-200/80 bg-white px-3 py-2 text-sm font-semibold text-ink shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-brass/30 hover:shadow-md;
+        animation: dash-rise 0.45s ease both;
+    }
+
+    .dash-icon {
+        @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-ink text-brass-light;
+    }
+
+    .kpi {
+        @apply card relative p-5;
+        animation: dash-rise 0.5s ease both;
+    }
+
+    .chart-bar {
+        transform-origin: left center;
+        animation: dash-grow 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    }
+}
+
+@keyframes dash-rise {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@keyframes dash-grow {
+    from {
+        transform: scaleX(0);
+    }
+
+    to {
+        transform: scaleX(1);
+    }
+}
+
+.dash-links .dash-link:nth-child(2) { animation-delay: 40ms; }
+.dash-links .dash-link:nth-child(3) { animation-delay: 80ms; }
+.dash-links .dash-link:nth-child(4) { animation-delay: 120ms; }
+.dash-links .dash-link:nth-child(5) { animation-delay: 160ms; }
+.dash-links .dash-link:nth-child(6) { animation-delay: 200ms; }
+.dash-links .dash-link:nth-child(7) { animation-delay: 240ms; }
+.dash-links .dash-link:nth-child(8) { animation-delay: 280ms; }
+.dash-links .dash-link:nth-child(9) { animation-delay: 320ms; }
+.dash-links .dash-link:nth-child(10) { animation-delay: 360ms; }
+.dash-links .dash-link:nth-child(11) { animation-delay: 400ms; }
+.dash-links .dash-link:nth-child(12) { animation-delay: 440ms; }
+
+.kpi-grid .kpi:nth-child(2) { animation-delay: 60ms; }
+.kpi-grid .kpi:nth-child(3) { animation-delay: 120ms; }
+.kpi-grid .kpi:nth-child(4) { animation-delay: 180ms; }
+.kpi-grid .kpi:nth-child(5) { animation-delay: 240ms; }
+.kpi-grid .kpi:nth-child(6) { animation-delay: 300ms; }
+.kpi-grid .kpi:nth-child(7) { animation-delay: 360ms; }
+.kpi-grid .kpi:nth-child(8) { animation-delay: 420ms; }
+.kpi-grid .kpi:nth-child(9) { animation-delay: 480ms; }
+
+@media (prefers-reduced-motion: reduce) {
+    .dash-link,
+    .kpi,
+    .chart-bar {
+        animation: none;
+    }
 }
