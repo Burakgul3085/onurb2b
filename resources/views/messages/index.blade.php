@@ -2,9 +2,17 @@
     <x-slot name="header">
         <div class="flex flex-wrap items-center justify-between gap-4">
             <h2 class="text-2xl font-semibold tracking-tight text-ink">{{ __('Messages') }}</h2>
-            @can('create', App\Models\MessageThread::class)
-                <a href="{{ route('messages.create') }}" class="btn btn-primary">{{ __('Write a message') }}</a>
-            @endcan
+            <div class="flex flex-wrap gap-2">
+                @can('import', App\Models\MessageThread::class)
+                    <form method="POST" action="{{ route('messages.import') }}">
+                        @csrf
+                        <button class="btn-secondary">{{ __('Fetch mail') }}</button>
+                    </form>
+                @endcan
+                @can('create', App\Models\MessageThread::class)
+                    <a href="{{ route('messages.create') }}" class="btn btn-primary">{{ __('Write a message') }}</a>
+                @endcan
+            </div>
         </div>
     </x-slot>
 

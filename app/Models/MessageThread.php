@@ -16,6 +16,7 @@ class MessageThread extends Model
         'order_id',
         'user_id',
         'subject',
+        'mail_token',
     ];
 
     protected static function booted(): void

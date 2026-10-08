@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Storage;
 class UpdateCompanySetting
 {
     /**
-     * @param  array{legal_name: string, tax_number?: string|null, tax_office?: string|null, address: string, footnote: string}  $data
+     * @param  array{legal_name: string, tax_number?: string|null, tax_office?: string|null, address: string, footnote: string, notification_email: string}  $data
      */
     public function execute(array $data, ?UploadedFile $logo = null): CompanySetting
     {
@@ -23,6 +23,7 @@ class UpdateCompanySetting
             'tax_office' => $taxOffice === '' ? null : $taxOffice,
             'address' => trim($data['address']),
             'footnote' => trim($data['footnote']),
+            'notification_email' => trim($data['notification_email']),
         ]);
 
         if ($logo !== null) {

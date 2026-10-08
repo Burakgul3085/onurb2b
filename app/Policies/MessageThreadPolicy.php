@@ -31,6 +31,11 @@ class MessageThreadPolicy
         return $actor->can(Permission::MessagesSend->value);
     }
 
+    public function import(User $actor): bool
+    {
+        return $actor->dealer_id === null && $actor->can(Permission::MessagesView->value);
+    }
+
     public function reply(User $actor, MessageThread $thread): bool
     {
         return $this->create($actor) && $this->view($actor, $thread);

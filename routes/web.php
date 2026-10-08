@@ -49,6 +49,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dealers/create', [DealerController::class, 'create'])->name('dealers.create');
     Route::post('/dealers', [DealerController::class, 'store'])->name('dealers.store');
     Route::get('/dealers/{dealer}', [DealerController::class, 'show'])->name('dealers.show');
+    Route::patch('/dealers/{dealer}/notification-email', [DealerController::class, 'updateNotificationEmail'])->middleware('throttle:10,1')->name('dealers.notification-email');
     Route::get('/dealers/{dealer}/edit', [DealerController::class, 'edit'])->name('dealers.edit');
     Route::patch('/dealers/{dealer}', [DealerController::class, 'update'])->name('dealers.update');
     Route::post('/dealers/{dealer}/approve', [DealerController::class, 'approve'])->middleware('throttle:10,1')->name('dealers.approve');
@@ -68,6 +69,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/deliveries/{delivery}', [DeliveryController::class, 'destroy'])->name('deliveries.destroy');
 
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::post('/messages/import', [MessageController::class, 'import'])->middleware('throttle:6,1')->name('messages.import');
     Route::get('/messages/create', [MessageController::class, 'create'])->name('messages.create');
     Route::post('/messages', [MessageController::class, 'store'])->middleware('throttle:20,1')->name('messages.store');
     Route::get('/messages/{thread}', [MessageController::class, 'show'])->name('messages.show');

@@ -23,6 +23,7 @@ class UpdateCompanySettingRequest extends FormRequest
             'tax_office' => ['nullable', 'string', 'max:255'],
             'address' => ['required', 'string', 'max:1000'],
             'footnote' => ['required', 'string', 'max:2000'],
+            'notification_email' => ['required', 'email', 'max:255'],
             'logo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'extensions:jpg,jpeg,png,webp', 'max:2048'],
         ];
     }

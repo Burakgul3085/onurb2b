@@ -95,6 +95,20 @@
             </dl>
         </div>
 
+        @if (auth()->user()->dealer_id !== null && (int) auth()->user()->dealer_id === (int) $dealer->id)
+            <form method="POST" action="{{ route('dealers.notification-email', $dealer) }}" class="card space-y-4 p-6 sm:p-8">
+                @csrf
+                @method('PATCH')
+                <div>
+                    <x-input-label for="email" :value="__('Notification email')" />
+                    <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $dealer->email)" required />
+                    <p class="mt-1 text-xs text-ink-muted">{{ __('Order notices and replies are sent to this address.') }}</p>
+                    <x-input-error class="mt-2" :messages="$errors->get('email')" />
+                </div>
+                <x-primary-button>{{ __('Save') }}</x-primary-button>
+            </form>
+        @endif
+
         @can('approve', $dealer)
             @if ($dealer->application_status === \App\Enums\DealerApplicationStatus::Pending)
                 <div class="card">

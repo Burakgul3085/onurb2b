@@ -29,6 +29,11 @@ class SendTemplatedMail implements ShouldQueue
         try {
             Mail::raw($log->body, function ($message) use ($log) {
                 $message->to($log->recipient)->subject($log->subject);
+                $replyTo = config('mail.from.address');
+
+                if (is_string($replyTo) && $replyTo !== '') {
+                    $message->replyTo($replyTo);
+                }
             });
 
             $log->update([

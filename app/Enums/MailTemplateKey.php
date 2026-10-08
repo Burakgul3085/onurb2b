@@ -17,6 +17,9 @@ enum MailTemplateKey: string
     case DueDateApproaching = 'due_date_approaching';
     case CriticalStock = 'critical_stock';
     case DailyReport = 'daily_report';
+    case DealerApplicationOffice = 'dealer_application_office';
+    case OrderPlacedOffice = 'order_placed_office';
+    case DueDateOffice = 'due_date_office';
     case NewMessage = 'new_message';
 
     public function label(): string
@@ -35,6 +38,9 @@ enum MailTemplateKey: string
             self::DueDateApproaching => 'Vade yaklaşması',
             self::CriticalStock => 'Kritik stok',
             self::DailyReport => 'Günlük rapor',
+            self::DealerApplicationOffice => 'Başvuru firma kopyası',
+            self::OrderPlacedOffice => 'Sipariş firma kopyası',
+            self::DueDateOffice => 'Vade firma kopyası',
             self::NewMessage => 'Yeni mesaj',
         };
     }

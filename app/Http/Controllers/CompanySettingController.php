@@ -22,7 +22,7 @@ class CompanySettingController extends Controller
     public function update(UpdateCompanySettingRequest $request, UpdateCompanySetting $updateCompanySetting): RedirectResponse
     {
         $updateCompanySetting->execute(
-            $request->safe()->only(['legal_name', 'tax_number', 'tax_office', 'address', 'footnote']),
+            $request->safe()->only(['legal_name', 'tax_number', 'tax_office', 'address', 'footnote', 'notification_email']),
             $request->file('logo'),
         );
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Mail\ImportMailboxReplies;
 use App\Actions\Messages\PostMessage;
 use App\Enums\DealerApplicationStatus;
 use App\Http\Requests\Messages\ReplyMessageRequest;
@@ -13,6 +14,7 @@ use App\Policies\MessageThreadPolicy;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Throwable;
 
 class MessageController extends Controller
 {
@@ -31,6 +33,19 @@ class MessageController extends Controller
         return view('messages.index', [
             'threads' => $threads,
         ]);
+    }
+
+    public function import(Request $request, ImportMailboxReplies $import): RedirectResponse
+    {
+        $this->authorize('import', MessageThread::class);
+
+        try {
+            $count = $import->execute();
+        } catch (Throwable) {
+            return back()->with('status', __('The mailbox could not be read.'));
+        }
+
+        return back()->with('status', __('Replies imported: :count', ['count' => $count]));
     }
 
     public function create(Request $request): View

@@ -6,11 +6,13 @@ use App\Actions\Dealers\ApproveDealer;
 use App\Actions\Dealers\CreateDealer;
 use App\Actions\Dealers\RejectDealer;
 use App\Actions\Dealers\UpdateDealer;
+use App\Actions\Dealers\UpdateDealerNotificationEmail;
 use App\Enums\DealerApplicationStatus;
 use App\Enums\District;
 use App\Http\Requests\Dealers\ApproveDealerRequest;
 use App\Http\Requests\Dealers\RejectDealerRequest;
 use App\Http\Requests\Dealers\StoreDealerRequest;
+use App\Http\Requests\Dealers\UpdateDealerNotificationEmailRequest;
 use App\Http\Requests\Dealers\UpdateDealerRequest;
 use App\Models\Dealer;
 use App\Models\PriceList;
@@ -108,6 +110,15 @@ class DealerController extends Controller
         return redirect()
             ->route('dealers.show', $dealer)
             ->with('status', __('Dealer updated.'));
+    }
+
+    public function updateNotificationEmail(UpdateDealerNotificationEmailRequest $request, Dealer $dealer, UpdateDealerNotificationEmail $update): RedirectResponse
+    {
+        $update->execute($dealer, $request->user(), $request->string('email')->toString());
+
+        return redirect()
+            ->route('dealers.show', $dealer)
+            ->with('status', __('Notification email saved.'));
     }
 
     public function approve(ApproveDealerRequest $request, Dealer $dealer, ApproveDealer $approveDealer): RedirectResponse

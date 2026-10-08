@@ -13,7 +13,10 @@ class Message extends Model
     protected $fillable = [
         'message_thread_id',
         'user_id',
+        'sender_name',
+        'sender_email',
         'body',
+        'external_message_id',
     ];
 
     protected static function booted(): void

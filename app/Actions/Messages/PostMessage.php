@@ -10,6 +10,7 @@ use App\Models\MessageThread;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class PostMessage
@@ -46,6 +47,7 @@ class PostMessage
                 'order_id' => $orderId,
                 'user_id' => $actor->id,
                 'subject' => trim($subject),
+                'mail_token' => strtolower(Str::random(10)),
             ]);
 
             $message = $thread->messages()->create([

@@ -3,7 +3,7 @@
 namespace App\Actions\Mail;
 
 use App\Enums\MailTemplateKey;
-use App\Enums\Permission;
+use App\Models\CompanySetting;
 use App\Models\Dealer;
 use App\Models\LedgerEntry;
 use App\Models\Message;
@@ -24,6 +24,12 @@ class Notify
         }
 
         $this->mail->execute(MailTemplateKey::DealerApplication, $dealer->email, $this->dealerFields($dealer));
+        $this->office(MailTemplateKey::DealerApplicationOffice, [
+            'contact' => CompanySetting::current()->legal_name,
+            'company' => $dealer->company_name,
+            'email' => $dealer->email,
+            'phone' => $dealer->phone,
+        ], $dealer->email);
     }
 
     public function dealerApproved(int $dealerId): void
@@ -68,6 +74,18 @@ class Notify
     public function orderPlaced(int $orderId): void
     {
         $this->orderMail(MailTemplateKey::OrderPlaced, $orderId);
+
+        $order = Order::query()->with(['user', 'dealer'])->find($orderId);
+
+        if ($order === null) {
+            return;
+        }
+
+        $this->office(MailTemplateKey::OrderPlacedOffice, [
+            'contact' => CompanySetting::current()->legal_name,
+            'company' => $order->dealer->company_name,
+            'order_number' => $order->number,
+        ], $order->user?->email);
     }
 
     public function orderApproved(int $orderId): void
@@ -118,7 +136,7 @@ class Notify
             $this->mail->execute(MailTemplateKey::NewMessage, $recipient['email'], [
                 'contact' => $recipient['name'],
                 'sender' => $message->user->name,
-                'subject' => $thread->subject,
+                'subject' => trim($thread->subject.' [OB-'.$thread->mail_token.']'),
                 'body' => $message->body,
                 'order_number' => $thread->order?->number ?? '',
                 'company' => $thread->dealer->company_name,
@@ -134,10 +152,21 @@ class Notify
             return false;
         }
 
-        return $this->mail->execute(MailTemplateKey::DueDateApproaching, $entry->dealer->email, [
+        $dueOn = $entry->due_on?->timezone(config('app.timezone'))->format('d.m.Y') ?? '';
+        $sent = $this->mail->execute(MailTemplateKey::DueDateApproaching, $entry->dealer->email, [
             ...$this->dealerFields($entry->dealer),
-            'due_on' => $entry->due_on?->timezone(config('app.timezone'))->format('d.m.Y') ?? '',
+            'due_on' => $dueOn,
         ]);
+
+        $this->office(MailTemplateKey::DueDateOffice, [
+            'contact' => CompanySetting::current()->legal_name,
+            'company' => $entry->dealer->company_name,
+            'order_number' => $entry->order?->number ?? '',
+            'amount' => Money::format($entry->debit).' ₺',
+            'due_on' => $dueOn,
+        ], $entry->dealer->email);
+
+        return $sent;
     }
 
     public function criticalStock(User $user, string $lines): bool
@@ -174,6 +203,20 @@ class Notify
     }
 
     /**
+     * @param  array<string, string>  $fields
+     */
+    private function office(MailTemplateKey $key, array $fields, ?string $except = null): void
+    {
+        $email = trim((string) CompanySetting::current()->notification_email);
+
+        if ($email === '' || ($except !== null && strcasecmp($email, $except) === 0)) {
+            return;
+        }
+
+        $this->mail->execute($key, $email, $fields);
+    }
+
+    /**
      * @return array{contact: string, company: string}
      */
     private function dealerFields(Dealer $dealer): array
@@ -190,16 +233,13 @@ class Notify
     private function recipients(User $sender, Dealer $dealer): array
     {
         if ($sender->dealer_id !== null) {
-            return User::query()
-                ->whereNull('dealer_id')
-                ->where('is_active', true)
-                ->whereKeyNot($sender->id)
-                ->permission(Permission::MessagesView->value)
-                ->get()
-                ->map(fn (User $user) => ['name' => $user->name, 'email' => $user->email])
-                ->filter(fn (array $user) => $user['email'] !== $sender->email)
-                ->values()
-                ->all();
+            $email = trim((string) CompanySetting::current()->notification_email);
+
+            if ($email === '' || strcasecmp($email, $sender->email) === 0) {
+                return [];
+            }
+
+            return [['name' => CompanySetting::current()->legal_name, 'email' => $email]];
         }
 
         $users = User::query()

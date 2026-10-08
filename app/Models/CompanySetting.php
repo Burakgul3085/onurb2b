@@ -16,6 +16,7 @@ class CompanySetting extends Model
         'address',
         'logo_path',
         'footnote',
+        'notification_email',
     ];
 
     public static function current(): self

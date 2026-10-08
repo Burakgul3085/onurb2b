@@ -38,6 +38,12 @@
                 <x-input-error class="mt-2" :messages="$errors->get('footnote')" />
             </div>
             <div>
+                <x-input-label for="notification_email" :value="__('Company mailbox')" />
+                <x-text-input id="notification_email" name="notification_email" type="email" class="mt-1 block w-full" :value="old('notification_email', $setting->notification_email)" required />
+                <p class="mt-1 text-xs text-ink-muted">{{ __('Applications, new orders and approaching dues are copied here. A dealer can change only their own address.') }}</p>
+                <x-input-error class="mt-2" :messages="$errors->get('notification_email')" />
+            </div>
+            <div>
                 <x-input-label for="logo" :value="__('Logo')" />
                 <input id="logo" name="logo" type="file" accept="image/jpeg,image/png,image/webp" class="mt-1 block w-full text-sm">
                 <x-input-error class="mt-2" :messages="$errors->get('logo')" />

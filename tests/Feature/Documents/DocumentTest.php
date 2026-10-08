@@ -152,9 +152,11 @@ test('a completed delivery issues a note that keeps the company snapshot', funct
         'tax_number' => '1234567890',
         'address' => 'Eskişehir',
         'footnote' => 'Ek dipnot',
+        'notification_email' => 'posta@onur.test',
     ])->assertRedirect();
 
     expect(CompanySetting::current()->legal_name)->toBe('Onur Dağıtım')
+        ->and(CompanySetting::current()->notification_email)->toBe('posta@onur.test')
         ->and($document->refresh()->company_legal_name)->toBe('Onur Kırtasiye');
 });
 

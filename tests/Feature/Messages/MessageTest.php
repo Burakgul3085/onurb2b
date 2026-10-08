@@ -23,7 +23,7 @@ use Database\Seeders\UnitSeeder;
 use Illuminate\Support\Facades\Mail;
 
 test('mail templates are stored and an inactive template is skipped', function () {
-    expect(MailTemplate::query()->count())->toBe(14);
+    expect(MailTemplate::query()->count())->toBe(17);
     expect(MailTemplate::query()->where('key', MailTemplateKey::DueDateApproaching)->first()->is_active)->toBeTrue();
 
     MailTemplate::query()->where('key', MailTemplateKey::OrderPlaced)->update(['is_active' => false]);
@@ -131,7 +131,8 @@ test('dealer decisions and order messages notify the right people', function () 
     expect($placed->status)->toBe(MailStatus::Sent)
         ->and($placed->subject)->toBe('Siparişiniz alındı')
         ->and($placed->body)->toContain($order->number)
-        ->and(MailLog::query()->where('recipient', $driver->email)->count())->toBe(0);
+        ->and(MailLog::query()->where('recipient', $driver->email)->count())->toBe(0)
+        ->and(MailLog::query()->where('recipient', 'burakgul3085@gmail.com')->where('subject', 'like', 'Yeni sipariş:%')->exists())->toBeTrue();
 
     $this->actingAs($admin)->post(route('orders.approve', $order), [
         'warehouse_id' => $stockWarehouse->id,
@@ -162,9 +163,9 @@ test('dealer decisions and order messages notify the right people', function () 
     $thread = MessageThread::query()->where('dealer_id', $dealer->id)->first();
     expect($thread->order_id)->toBe($order->id);
 
-    $notice = MailLog::query()->where('subject', 'Yeni mesaj: Teslimat saati')->get();
-    expect($notice)->toHaveCount(2)
-        ->and($notice->pluck('recipient')->sort()->values()->all())->toEqual(collect([$admin->email, $super->email])->sort()->values()->all())
+    $notice = MailLog::query()->where('subject', 'like', 'Yeni mesaj: Teslimat saati [OB-%')->get();
+    expect($notice)->toHaveCount(1)
+        ->and($notice->first()->recipient)->toBe('burakgul3085@gmail.com')
         ->and($notice->pluck('recipient'))->not->toContain($driver->email);
 
     $this->actingAs($other)->get(route('messages.show', $thread))->assertNotFound();
@@ -179,7 +180,7 @@ test('dealer decisions and order messages notify the right people', function () 
         ->assertSee('Sabah 09:00')
         ->assertDontSee($driver->email);
 
-    expect(MailLog::query()->where('recipient', $shopper->email)->where('subject', 'Yeni mesaj: Teslimat saati')->exists())->toBeTrue()
+    expect(MailLog::query()->where('recipient', $shopper->email)->where('subject', 'like', 'Yeni mesaj: Teslimat saati [OB-%')->exists())->toBeTrue()
         ->and($thread->delete())->toBeFalse()
         ->and(Message::query()->first()->delete())->toBeFalse();
 

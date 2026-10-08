@@ -9,6 +9,7 @@ Schedule::command('ops:cleanup')->dailyAt('03:30')->withoutOverlapping();
 Schedule::command('ops:notify-dues')->dailyAt('08:00')->withoutOverlapping();
 Schedule::command('ops:critical-stock')->dailyAt('08:05')->withoutOverlapping();
 Schedule::command('ops:daily-report')->dailyAt('08:10')->withoutOverlapping();
+Schedule::command('ops:import-mail')->everyFiveMinutes()->withoutOverlapping();
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());

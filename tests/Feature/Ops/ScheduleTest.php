@@ -31,6 +31,7 @@ test('the scheduler runs the backup at night and the notices in the morning', fu
         ->expectsOutputToContain('ops:notify-dues')
         ->expectsOutputToContain('ops:critical-stock')
         ->expectsOutputToContain('ops:daily-report')
+        ->expectsOutputToContain('ops:import-mail')
         ->assertSuccessful();
 });
 
@@ -68,6 +69,9 @@ test('a due date is mailed once and a later due date stays quiet', function () {
     expect(MailLog::query()->where('recipient', 'vade@example.test')->whereHas('template', function ($query) {
         $query->where('key', MailTemplateKey::DueDateApproaching);
     })->count())->toBe(1)
+        ->and(MailLog::query()->where('recipient', 'burakgul3085@gmail.com')->whereHas('template', function ($query) {
+            $query->where('key', MailTemplateKey::DueDateOffice);
+        })->count())->toBe(1)
         ->and($soon->refresh()->due_notified_at)->not->toBeNull();
 });
 

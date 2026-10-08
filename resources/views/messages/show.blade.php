@@ -11,7 +11,10 @@
         <div class="space-y-3">
             @foreach ($thread->messages as $message)
                 <article class="card p-5">
-                    <p class="text-sm font-semibold text-ink">{{ $message->user->name }}</p>
+                    <p class="text-sm font-semibold text-ink">{{ $message->user?->name ?? $message->sender_name ?? __('Mail reply') }}</p>
+                    @if ($message->sender_email)
+                        <p class="text-xs text-ink-muted">{{ $message->sender_email }}</p>
+                    @endif
                     <p class="text-xs text-ink-muted">{{ $message->created_at->format('d.m.Y H:i') }}</p>
                     <p class="mt-3 whitespace-pre-line text-sm">{{ $message->body }}</p>
                 </article>
